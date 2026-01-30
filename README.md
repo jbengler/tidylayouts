@@ -15,7 +15,7 @@ layouts using a consistent and intuitive syntax.
 support for plots with absolute dimensions, such as those created with
 `tidyplots`.
 
-## ⚠️ Disclaimer ⚠️
+## ⚠️ Warning ⚠️
 
 This package is not yet functional. It is **not intended for production
 use** at this stage. If you would like to stay informed, feel free to
