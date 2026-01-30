@@ -16,5 +16,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://github.com/jbengler/tidylayouts
+URL: https://github.com/jbengler/tidylayouts, https://jbengler.github.io/tidylayouts/
 BugReports: https://github.com/jbengler/tidylayouts/issues

@@ -6,3 +6,4 @@
 ^pkgdown$
 ^README\.Rmd$
 ^playground\.R
+^\.github$
