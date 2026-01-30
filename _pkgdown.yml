@@ -1,0 +1,28 @@
+url: ~
+template:
+  bootstrap: 5
+
+authors:
+  Jan Broder Engler:
+    href: https://github.com/jbengler
+
+figures:
+  dpi: 200
+
+reference:
+- title:
+  desc: >
+    To create a layout, first assign your plots to variables such as `p1`, `p2`, and `p3`.
+    Then, define a base layout and progressively expand and adjust it.
+- title: Create
+- contents:
+  - row
+- title: Add
+- contents:
+  - starts_with("add")
+- title: Adjust
+- contents:
+  - starts_with("layout")
+- title: Helpers
+- contents:
+  - spacer

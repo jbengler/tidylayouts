@@ -1,0 +1,18 @@
+Package: tidylayouts
+Title: Layout composer for tidyplots
+Version: 0.0.0.9000
+Authors@R: 
+    person("Jan Broder", "Engler", , "broder.engler@gmail.com", role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "0000-0002-3169-2076"))
+Description: The goal of 'tidylayouts' is to streamline the creation of multiplot layouts for scientific papers. It allows to gradually expand and adjust layouts using a consistent and intuitive syntax.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    ggalign,
+    tidyplots
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
