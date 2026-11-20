@@ -10,19 +10,34 @@ figures:
   dpi: 200
 
 reference:
-- title:
+- title: Create
   desc: >
     To create a layout, first assign your plots to variables such as `p1`, `p2`, and `p3`.
     Then, define a base layout and progressively expand and adjust it.
-- title: Create
+    Plots are aligned by their panels.
 - contents:
   - row
-- title: Add
+  - layout_plots
+- title: Extend
+  desc: >
+    Add plots to the right of or below a layout.
 - contents:
-  - starts_with("add")
+  - starts_with("add_")
+- title: Stretch and center
+  desc: >
+    Panel sizes are set on the plot (`tidyplots::adjust_size()` or `theme(panel.widths)`).
+    A plot can take the spare space next to it, either stretching its panel or staying centered.
+- contents:
+  - stretch_x
 - title: Adjust
+  desc: >
+    Options for the whole figure.
 - contents:
-  - starts_with("layout")
-- title: Helpers
+  - starts_with("layout_")
+  - tag_group
+- title: Save
 - contents:
-  - spacer
+  - save_layout
+- title: Placeholders
+- contents:
+  - dummy

@@ -7,3 +7,4 @@
 ^README\.Rmd$
 ^playground\.R
 ^\.github$
+^\.claude$
