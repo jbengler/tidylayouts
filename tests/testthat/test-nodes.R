@@ -1,7 +1,7 @@
 p <- dummy()
 
-test_that("containers build the expected tree", {
-  l <- row(p, p)
+test_that("new_row builds the expected tree", {
+  l <- new_row(p, p)
   expect_s3_class(l, "tidylayout")
   expect_equal(l$type, "row")
   expect_length(l$children, 2)
@@ -9,48 +9,43 @@ test_that("containers build the expected tree", {
 })
 
 test_that("NULL is dropped in rows and kept as empty cell in grids", {
-  expect_length(row(p, NULL, p)$children, 2)
-  g <- grid(p, NULL, p, ncol = 2)
+  expect_length(new_row(p, NULL, p)$children, 2)
+  g <- new_grid(p, NULL, p, ncol = 2)
   expect_length(g$children, 4)
   expect_equal(vapply(g$children, `[[`, "", "type"), c("plot", "spacer", "plot", "spacer"))
   expect_equal(c(g$ncol, g$nrow), c(2L, 2L))
 })
 
 test_that("lists are spliced", {
-  expect_length(row(list(p, list(p, p)))$children, 3)
-  expect_length(row(stretch_y(p, p))$children, 2)
+  expect_length(new_row(list(p, list(p, p)))$children, 3)
+  expect_length(new_row(auto_height(p, p))$children, 2)
 })
 
-test_that("pipe verbs append to the same direction and wrap otherwise", {
-  l <- row(p, p) |> add_right(p)
-  expect_equal(l$type, "row")
+test_that("new rows, columns and grids append or wrap", {
+  l <- new_row(p, p) |> new_row(p)
+  expect_equal(l$type, "column")
+  expect_equal(vapply(l$children, `[[`, "", "type"), c("row", "row"))
+
+  l <- new_row(p, p) |> new_row(p) |> new_row(p)
   expect_length(l$children, 3)
 
-  l <- row(p, p) |> add_below(p)
-  expect_equal(l$type, "column")
-  expect_equal(l$children[[1]]$type, "row")
-
-  l <- grid(p, p, p, p) |> add_right(p)
+  l <- new_grid(p, p, p, p) |> new_column(p)
   expect_equal(l$type, "row")
   expect_equal(l$children[[1]]$type, "grid")
-
-  expect_equal(add_right(p, p)$type, "row")
 })
 
-test_that("alignment arguments are validated and updated on append", {
-  expect_error(row(p, vertical_align = "left"), "vertical_align")
-  expect_error(column(p, horizontal_align = "top"), "horizontal_align")
-  l <- column(p) |> add_below(p, horizontal_align = "right")
-  expect_equal(l$align$x, "end")
-  expect_equal(l$align$y, "end")
+test_that("alignment arguments are validated", {
+  expect_error(new_row(p, vertical_align = "left"), "vertical_align")
+  expect_error(new_column(p, horizontal_align = "top"), "horizontal_align")
+  expect_error(new_row(p, horizontal_align = "top"), "horizontal_align")
 })
 
 test_that("layout options stay with the root when wrapping", {
-  l <- row(p, p) |> layout_tags("a") |> add_below(p)
+  l <- new_row(p, p) |> layout_tags("a") |> new_column(p)
   expect_equal(l$opts$tags$tags, "a")
   expect_null(l$children[[1]]$opts)
 })
 
 test_that("non-plot input errors", {
-  expect_error(row(p, 1), "numeric")
+  expect_error(new_row(p, 1), "numeric")
 })

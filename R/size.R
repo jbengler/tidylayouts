@@ -1,34 +1,34 @@
-#' Stretch or center plots in the available space
+#' Panel sizes and margins in a layout
 #'
-#' A plot often has more space in a layout than its panel needs, e.g. a
-#' plot below a row of plots, or next to a taller plot. These functions let
-#' the plot take that spare space:
+#' A plot often has more space in a layout than its panel needs, e.g. a plot
+#' below a row of plots, or next to a taller plot. These functions decide how
+#' a plot uses that space:
 #'
-#' * `stretch_x()` and `stretch_y()` stretch the panel to fill the spare
-#'   width or height.
-#' * `center_x()` and `center_y()` keep the panel at its size and center the
-#'   plot in the spare space, with equal room on both sides. Its tag stays at
-#'   the edge of the space. Only spare space within the row, column or grid
-#'   the plot sits in is used; a centered plot never makes that container
-#'   wider or taller.
+#' * `auto_width()` and `auto_height()` let the layout decide the panel size:
+#'   the panel takes exactly the space the plot gets from its neighbours. It
+#'   can become larger or smaller than before.
+#' * `auto_margins()` keeps the panel at its size and centers the plot in the
+#'   spare space, with equal room on both sides (like `margin: auto` in CSS).
+#'   The tag stays at the edge of the space. Only spare space within the
+#'   row, column or grid the plot sits in is used. Centering vertically
+#'   (`y = TRUE`) moves the plot away from the row's shared bottom edge, so
+#'   its x axis no longer lines up with its neighbours'.
+#' * `set_size()` sets a fixed panel size in mm. For tidyplots it calls
+#'   `tidyplots::adjust_size()`; for plain ggplots it sets
+#'   `theme(panel.widths, panel.heights)`, always per panel (also for facets).
 #'
-#' `x` and `y` refer to the horizontal and vertical direction of the figure.
-#' For plots with flipped coordinates, `stretch_x()` therefore stretches the
-#' plot's y axis. If several plots in a row or column take spare space, they
-#' share it equally.
-#'
-#' Panel sizes themselves are set on the plot: with `tidyplots::adjust_size()`
-#' for tidyplots, or with `theme(panel.widths, panel.heights)` for plain
-#' ggplots (a single unit sets the total size of all facet panels; use e.g.
-#' `unit(c(30, 30), "mm")` for 30 mm per panel). These functions work for
-#' both. Layouts are modified recursively, i.e. all plots inside them are
-#' changed.
+#' If several plots in a row or column take spare space, they share it
+#' equally. These functions work for tidyplots and plain ggplots. Layouts are
+#' modified recursively, i.e. all plots inside them are changed.
 #'
 #' @param ... ggplots, layouts, or lists of them.
+#' @param x,y Center horizontally / vertically.
+#' @param width,height Panel width and height in mm. `NULL` leaves a
+#'   dimension unchanged.
 #'
 #' @returns The modified plot or layout if one object was supplied, otherwise
-#'   a list. Layout functions such as [row()] splice such lists, so
-#'   `add_right(stretch_y(p1, p2))` works.
+#'   a list. Layout functions such as [new_row()] splice such lists, so
+#'   `new_column(auto_height(p1, p2))` works.
 #'
 #' @examples
 #' p1 <- dummy(name = "p1", color = "#0072B2")
@@ -36,38 +36,64 @@
 #' p3 <- dummy(name = "p3", color = "#009E73")
 #' wide <- dummy(name = "wide", color = "#E69F00", width = 50)
 #'
-#' column(p1, p2) |>
-#'   add_right(stretch_y(p3))
+#' new_column(p1, p2) |>
+#'   new_column(auto_height(p3))
 #'
-#' row(p1, p2) |>
-#'   add_below(stretch_x(p3))
+#' new_row(p1, p2) |>
+#'   new_row(auto_width(p3))
 #'
 #' # keep the panel size, center the plot in the spare width
-#' row(wide, wide) |>
-#'   add_below(row(p1, center_x(p2))) |>
+#' new_row(wide, wide) |>
+#'   new_row(p1, auto_margins(p2, y = FALSE)) |>
 #'   layout_tags("A")
 #'
+#' new_row(p1, set_size(p2, width = 45))
+#'
 #' @export
-stretch_x <- function(...) {
+auto_width <- function(...) {
   place_in_space(list(...), axis = "x", mode = "stretch")
 }
 
-#' @rdname stretch_x
+#' @rdname auto_width
 #' @export
-stretch_y <- function(...) {
+auto_height <- function(...) {
   place_in_space(list(...), axis = "y", mode = "stretch")
 }
 
-#' @rdname stretch_x
+#' @rdname auto_width
 #' @export
-center_x <- function(...) {
-  place_in_space(list(...), axis = "x", mode = "center")
+auto_margins <- function(..., x = TRUE, y = TRUE) {
+  check_flag <- function(value, arg) {
+    if (!is.logical(value) || length(value) != 1 || is.na(value)) {
+      stop("`", arg, "` must be TRUE or FALSE.", call. = FALSE)
+    }
+  }
+  check_flag(x, "x")
+  check_flag(y, "y")
+  if (!x && !y) stop("At least one of `x` and `y` must be TRUE.", call. = FALSE)
+  out <- lapply(list(...), function(item) {
+    if (x) item <- place_in_space(list(item), axis = "x", mode = "center")
+    if (y) item <- place_in_space(list(item), axis = "y", mode = "center")
+    item
+  })
+  if (length(out) == 1) out[[1]] else out
 }
 
-#' @rdname stretch_x
+#' @rdname auto_width
 #' @export
-center_y <- function(...) {
-  place_in_space(list(...), axis = "y", mode = "center")
+set_size <- function(..., width = NULL, height = NULL) {
+  check_size <- function(value, arg) {
+    if (is.null(value)) return(invisible())
+    if (!is.numeric(value) || length(value) != 1 || is.na(value) || value <= 0) {
+      stop("`", arg, "` must be a positive number (mm) or NULL. ",
+           "To let the layout decide, use `auto_width()` or `auto_height()`.",
+           call. = FALSE)
+    }
+  }
+  check_size(width, "width")
+  check_size(height, "height")
+  out <- lapply(list(...), resize, width = width, height = height)
+  if (length(out) == 1) out[[1]] else out
 }
 
 # "stretch": make the panel free (it fills the space) and drop centering.
@@ -76,7 +102,7 @@ center_y <- function(...) {
 place_in_space <- function(items, axis, mode) {
   out <- lapply(items, function(x) {
     if (mode == "stretch") {
-      x <- set_size(
+      x <- resize(
         x,
         width = if (axis == "x") NA else NULL,
         height = if (axis == "y") NA else NULL
@@ -87,7 +113,7 @@ place_in_space <- function(items, axis, mode) {
   if (length(out) == 1) out[[1]] else out
 }
 
-set_size <- function(x, width, height) {
+resize <- function(x, width, height) {
   if (is_ggplot(x)) return(set_plot_size(x, width, height))
   if (is_tidylayout(x)) {
     return(map_leaves(x, function(leaf) {
@@ -99,7 +125,7 @@ set_size <- function(x, width, height) {
     }))
   }
   if (is.list(x) && !is.object(x)) {
-    return(lapply(x, set_size, width = width, height = height))
+    return(lapply(x, resize, width = width, height = height))
   }
   stop(
     "Can't change the size of an object of class <", class(x)[1], ">.",
@@ -167,7 +193,8 @@ set_plot_size <- function(plot, width, height) {
 #' `spacer()` creates an empty slot; with `NA` sizes it absorbs leftover
 #' space, with a size in mm it is a fixed gap.
 #'
-#' @param width,height Panel size in mm. `NA` lets the panel stretch.
+#' @param width,height Panel size in mm. `NA` lets the layout decide (like
+#'   [auto_width()]).
 #' @param name Label shown in the panel.
 #' @param color Color of the panel border and label.
 #'
@@ -177,8 +204,8 @@ set_plot_size <- function(plot, width, height) {
 #' p1 <- dummy(name = "p1", color = "#0072B2")
 #' p2 <- dummy(name = "p2", color = "#D55E00")
 #'
-#' row(p1, spacer(width = 20), p2)
-#' row(p1, spacer(), p2) |> layout_size(width = 120)
+#' new_row(p1, spacer(width = 20), p2)
+#' new_row(p1, spacer(), p2) |> layout_size(width = 120)
 #'
 #' @export
 dummy <- function(width = 30, height = 30, name = "dummy", color = "darkgrey") {

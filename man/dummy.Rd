@@ -10,7 +10,8 @@ dummy(width = 30, height = 30, name = "dummy", color = "darkgrey")
 spacer(width = NA, height = NA)
 }
 \arguments{
-\item{width, height}{Panel size in mm. \code{NA} lets the panel stretch.}
+\item{width, height}{Panel size in mm. \code{NA} lets the layout decide (like
+\code{\link[=auto_width]{auto_width()}}).}
 
 \item{name}{Label shown in the panel.}
 
@@ -28,7 +29,7 @@ space, with a size in mm it is a fixed gap.
 p1 <- dummy(name = "p1", color = "#0072B2")
 p2 <- dummy(name = "p2", color = "#D55E00")
 
-row(p1, spacer(width = 20), p2)
-row(p1, spacer(), p2) |> layout_size(width = 120)
+new_row(p1, spacer(width = 20), p2)
+new_row(p1, spacer(), p2) |> layout_size(width = 120)
 
 }

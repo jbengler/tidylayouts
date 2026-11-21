@@ -16,7 +16,7 @@
 # A track exposes the outer edges of its children's panels. Its decorations
 # (lead/trail) are the maximum of its children's decorations.
 #
-# `auto` marks a centered plot (`center_x()`): its slot takes spare space
+# `auto` marks a centered plot (`auto_margins()`): its slot takes spare space
 # like a free panel (shared equally), but the panel keeps its size and is
 # centered in the slot. Like CSS auto margins, this only applies within the
 # container the plot sits in directly: containers never pass `auto` on to

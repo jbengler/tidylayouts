@@ -32,3 +32,42 @@ centered <- function(node, axis = "x") {
 fix <- function(p, width = NULL, height = NULL) {
   tidylayouts:::set_plot_size(p, width, height)
 }
+
+# Compact description of a layout tree, e.g. "column(row(p1, p2), p3)".
+structure_of <- function(node) {
+  if (!tidylayouts:::is_container(node)) {
+    if (node$type == "spacer") return("#")
+    return(node$plot$layers[[1]]$aes_params$label)
+  }
+  inner <- vapply(node$children, structure_of, character(1))
+  extra <- if (node$type == "grid") paste0("[", node$ncol, "]") else ""
+  paste0(node$type, extra, "(", paste(inner, collapse = ", "), ")")
+}
+
+named_dummies <- function(n) lapply(seq_len(n), function(i) dummy(name = paste0("p", i)))
+
+# Internal append-or-wrap, to build exact test trees compactly: `below()`
+# appends to a column or wraps in one, `beside()` does the same for rows.
+below <- function(layout, ..., horizontal_align = NULL, vertical_align = NULL) {
+  tidylayouts:::extend_layout(layout, "column", list(...), horizontal_align, vertical_align)
+}
+beside <- function(layout, ..., horizontal_align = NULL, vertical_align = NULL) {
+  tidylayouts:::extend_layout(layout, "row", list(...), horizontal_align, vertical_align)
+}
+
+# Test-only constructors for exact trees (the package exports only new_*()).
+# Not named row()/grid(): helpers are looked up after base, so base::row() wins.
+tl_row <- function(..., horizontal_align = "left", vertical_align = "bottom") {
+  tidylayouts:::new_container("row", tidylayouts:::collect_items(list(...)),
+                              horizontal_align, vertical_align)
+}
+tl_column <- function(..., horizontal_align = "left", vertical_align = "bottom") {
+  tidylayouts:::new_container("column", tidylayouts:::collect_items(list(...)),
+                              horizontal_align, vertical_align)
+}
+tl_grid <- function(..., ncol = NULL, nrow = NULL,
+                 horizontal_align = "left", vertical_align = "bottom") {
+  tidylayouts:::make_grid(list(...), ncol = ncol, nrow = nrow,
+                          horizontal_align = horizontal_align,
+                          vertical_align = vertical_align)
+}

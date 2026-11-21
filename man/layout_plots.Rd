@@ -9,10 +9,10 @@ layout_plots(
   design,
   arrange_by = c("row", "column", "grid"),
   tags = NULL,
-  stretch_x = NULL,
-  stretch_y = NULL,
-  center_x = NULL,
-  center_y = NULL
+  auto_width = NULL,
+  auto_height = NULL,
+  auto_margins_x = NULL,
+  auto_margins_y = NULL
 )
 }
 \arguments{
@@ -28,11 +28,12 @@ column) or \code{"grid"} (shared rows and columns).}
 \item{tags}{Panel tags, as in \code{\link[=layout_tags]{layout_tags()}}: \code{"A"}, \code{"a"}, \code{"1"}, \code{"I"},
 \code{"i"} or a character vector. \code{NULL} (default) adds no tags.}
 
-\item{stretch_x, stretch_y}{Letters of plots whose panel stretches to
-the available width or height (see \code{\link[=stretch_x]{stretch_x()}}), e.g. \code{"EF"}.}
+\item{auto_width, auto_height}{Letters of plots whose panel size is
+decided by the layout (see \code{\link[=auto_width]{auto_width()}}), e.g. \code{"EF"}.}
 
-\item{center_x, center_y}{Letters of plots that keep their panel size and
-are centered in the available width or height (see \code{\link[=center_x]{center_x()}}).}
+\item{auto_margins_x, auto_margins_y}{Letters of plots that keep their
+panel size and are centered horizontally or vertically in the available
+space (see \code{\link[=auto_margins]{auto_margins()}}).}
 }
 \value{
 A layout.
@@ -51,17 +52,17 @@ a rectangle. Uppercase and lowercase letters are different plots.
 
 The design describes the arrangement, not the size: plots keep their own
 panel sizes, also when they span several cells. To let a plot fill the
-space it spans, list it in \code{stretch_x} or \code{stretch_y} (or center it with
-\code{center_x}/\code{center_y}). Designs that can't be split along full rows and
+space it spans, list it in \code{auto_width} or \code{auto_height} (or center it
+with \code{auto_margins_x}/\code{auto_margins_y}). Designs that can't be split along full rows and
 columns (e.g. a pinwheel) are not supported.
 
 \strong{Arrangement.} The design is split along full rows and columns that no
 plot crosses. Blocks of plots without spanning plots are built according
 to \code{arrange_by}. With \code{"row"} (default), each line of the design becomes a
-\code{\link[=row]{row()}}, so \code{"AB\\nCD"} is the same as
-\code{row(A, B) |> add_below(row(C, D))}: each line is laid out on its own. With
-\code{"column"}, each design column becomes a \code{\link[=column]{column()}}. With \code{"grid"}, the
-block becomes a \code{\link[=grid]{grid()}}, so plots in the same row and column of the
+row, so \code{"AB\\nCD"} is the same as
+\code{new_row(A, B) |> new_row(C, D)}: each line is laid out on its own. With
+\code{"column"}, each design column becomes a column. With \code{"grid"}, the
+block becomes a grid (see \code{\link[=new_grid]{new_grid()}}), so plots in the same row and column of the
 design share their lines.
 
 \strong{Plot order.} Plots in \code{...} are assigned in alphabetical order of the
@@ -72,7 +73,7 @@ order, as with \code{\link[=layout_tags]{layout_tags()}}. To let several plots s
 them through \code{\link[=tag_group]{tag_group()}}, e.g. \code{layout_plots(tag_group(p1, p2), p3, ...)}.
 
 The result is a normal layout, so it can be extended and adjusted with
-\code{\link[=add_right]{add_right()}}, \code{\link[=layout_spacing]{layout_spacing()}} etc.
+\code{\link[=new_row]{new_row()}}, \code{\link[=layout_spacing]{layout_spacing()}} etc.
 }
 \examples{
 p <- lapply(paste0("p", 1:7), function(x) dummy(name = x))
@@ -84,8 +85,8 @@ layout_plots(
     CDEF
     GGGG
   ",
-  stretch_x = "G",
-  stretch_y = "EF",
+  auto_width = "G",
+  auto_height = "EF",
   tags = "A"
 )
 
@@ -97,7 +98,7 @@ layout_plots(
     D##
   ",
   tags = "A",
-  center_x = "D"
+  auto_margins_x = "D"
 )
 
 }

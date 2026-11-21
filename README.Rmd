@@ -27,22 +27,22 @@ The goal of `tidylayouts` is to streamline the creation of multi-plot layouts fo
 
 `tidylayouts` is built around the pipe and supports plots with absolute dimensions, such as those created with `tidyplots`, as well as plain `ggplot2` plots. Plots are aligned by their **panels**, not by their outer boxes, so axes and tags line up across the whole figure.
 
-<!--
-
 ## Installation
+
+<!--
 
 You can install the released version of tidylayouts from [CRAN](https://cran.r-project.org/) with:
 ``` r
 install.packages("tidylayouts")
 ```
 
-And the development version from [GitHub](https://github.com/) with:
+-->
+
+You can install the development version from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("pak")
 pak::pak("jbengler/tidylayouts")
 ```
-
--->
 
 ## Usage
 
@@ -59,18 +59,21 @@ p6 <- dummy(name = "p6", color = "#F5C710")
 p7 <- dummy(name = "p7", color = "#DD227D")
 ```
 
-Start with a row of plots and extend it step by step. `add_right()` and `add_below()` append to a row or column, or wrap the layout in a new one.
+Build a figure step by step: `new_row()` adds a row of plots below everything so far, `new_column()` adds a column to the right.
 
 ```{r usage-dummies, fig.asp = 0.8}
 library(tidylayouts)
 
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(stretch_y(p5, p6)) |>
-  add_below(stretch_x(p7))
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(auto_height(p5)) |>
+  new_column(auto_height(p6)) |>
+  new_row(auto_width(p7))
 ```
 
-All plots above have a fixed panel size of 30 × 30 mm. `stretch_y()` and `stretch_x()` let a panel fill the space it gets from its neighbours: `p5` and `p6` span the height of the block on the left, `p7` spans the width of everything above.
+All plots above have a fixed panel size of 30 × 30 mm. `auto_height()` and `auto_width()` let the layout decide the panel size: the panel fills the space it gets from its neighbours: `p5` and `p6` span the height of the block on the left, `p7` spans the width of everything above.
+
+`new_grid()` adds a block of plots that share rows and columns.
 
 ## Real plots
 
@@ -124,20 +127,22 @@ tidyplots_options()
 By default, plots keep their size. In a row, panels are aligned at the bottom so that the x axes line up. The panel tags are still aligned at the top of the row.
 
 ```{r real-fixed, fig.asp = 0.75}
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(p5, p6) |>
-  add_below(p7) |>
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(p5) |>
+  new_column(p6) |>
+  new_row(p7) |>
   layout_tags("A")
 ```
 
 Freeing the heatmaps and the violin plots makes them fill the available space.
 
 ```{r real-freed, fig.asp = 0.75}
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(stretch_y(p5, p6)) |>
-  add_below(stretch_x(p7)) |>
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(auto_height(p5)) |>
+  new_column(auto_height(p6)) |>
+  new_row(auto_width(p7)) |>
   layout_tags("A")
 ```
 
@@ -153,16 +158,16 @@ layout_plots(
     CDEF
     GGGG
   ",
-  stretch_x = "G",
-  stretch_y = "EF",
-  center_x = "D",
+  auto_width = "G",
+  auto_height = "EF",
+  auto_margins_x = "D",
   tags = "A"
 )
 ```
 
-By default, each line of the design becomes a row, so the figure above has the same structure as `row(p1, p2) |> add_below(row(p3, p4)) |> add_right(p5, p6) |> add_below(p7)`. With `arrange_by = "column"`, each design column becomes a column instead, and with `arrange_by = "grid"` plots in the same row and column of the design share their lines.
+By default, each line of the design becomes a row, so the figure above has the same structure as `new_row(p1, p2) |> new_row(p3, p4) |> new_column(p5) |> new_column(p6) |> new_row(p7)`. With `arrange_by = "column"`, each design column becomes a column instead, and with `arrange_by = "grid"` plots in the same row and column of the design share their lines.
 
-The design shows the arrangement, not the size: plots keep their panel sizes, also when they span several cells. `stretch_x`, `stretch_y`, `center_x` and `center_y` change that for the listed plots, just like the functions of the same name. Tags are numbered in reading order, as with `layout_tags()`; here `tag_group()` lets the first two plots share tag A.
+The design shows the arrangement, not the size: plots keep their panel sizes, also when they span several cells. `auto_width`, `auto_height`, `auto_margins_x` and `auto_margins_y` change that for the listed plots, like the functions `auto_width()`, `auto_height()` and `auto_margins()`. Tags are numbered in reading order, as with `layout_tags()`; here `tag_group()` lets the first two plots share tag A.
 
 ## Alignment
 
@@ -175,53 +180,79 @@ p3 <- dummy(name = "p3", color = "#009E73", width = 45)
 ```
 
 ```{r align, fig.asp = 0.4}
-row(p1, p2)
-row(p1, p2, vertical_align = "top")
-row(p1, p2, vertical_align = "center")
+new_row(p1, p2)
+new_row(p1, p2, vertical_align = "top")
+new_row(p1, p2, vertical_align = "center")
 ```
 
 ```{r align-column, fig.asp = 0.6}
-column(p1, p3, horizontal_align = "center")
+new_column(p1, p3, horizontal_align = "center")
 ```
 
 Alignment applies to what is directly inside a row or column. A nested row fills the width it is given and arranges its own plots, e.g. with the extra space between them:
 
 ```{r align-nested, fig.asp = 0.6}
-row(p3, p3) |>
-  add_below(row(p1, p1, horizontal_align = "justify"))
+new_row(p3, p3) |>
+  new_row(p1, p1, horizontal_align = "justify")
 ```
 
-To center a single plot within the spare space next to it, use `center_x()` or `center_y()`. The panel keeps its size, the extra space goes to both sides, and the tag stays at the edge of the space.
+To center a single plot within the spare space next to it, use `auto_margins()`. The panel keeps its size, the extra space goes to both sides, and the tag stays at the edge of the space. Use `y = FALSE` to center only horizontally, so the plot keeps the row's shared bottom edge.
 
 ```{r center, fig.asp = 0.6}
-row(p3, p3) |>
-  add_below(row(p1, center_x(p1))) |>
+new_row(p3, p3) |>
+  new_row(p1, auto_margins(p1, y = FALSE)) |>
   layout_tags("A")
 ```
 
 ## Rows of plots vs. grids
 
-`column(row(...), row(...))` lays out each row independently. `grid()` shares row and column tracks, so plots in the same grid column line up exactly.
+`new_row()` lays out each row independently. `new_grid()` shares row and column tracks, so plots in the same grid column line up exactly.
 
 ```{r grid-setup, include = FALSE}
 narrow <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
   ggplot2::geom_point()
-narrow <- narrow + ggplot2::theme(
-  panel.widths = grid::unit(30, "mm"), panel.heights = grid::unit(25, "mm")
-)
+narrow <- set_size(narrow, width = 30, height = 25)
 wide <- narrow + ggplot2::scale_y_continuous(labels = function(x) paste(x, "mpg"))
 ```
 
 ```{r grid, fig.asp = 0.6}
-column(row(narrow, narrow), row(wide, wide))
-grid(narrow, narrow, wide, wide, ncol = 2)
+new_row(narrow, narrow) |> new_row(wide, wide)
+new_grid(narrow, narrow, wide, wide, ncol = 2)
+```
+
+## Wrapping rows
+
+`new_row(..., wrap = <mm>)` breaks a long row into lines, like text in a word processor: each line takes as many plots as fit, axis labels and gaps included. This is handy when plots have different widths.
+
+```{r wrap-setup, include = FALSE}
+cols <- c("#0072B2", "#D55E00", "#009E73", "#E69F00", "#56B4E9", "#F5C710", "#DD227D")
+widths <- c(30, 45, 25, 50, 30, 40, 35)
+panels <- lapply(seq_along(widths), function(i) {
+  dummy(width = widths[i], height = 25, name = paste0("p", i), color = cols[i])
+})
+```
+
+```{r wrap, fig.asp = 0.7}
+new_row(panels, wrap = 140, horizontal_align = "justify") |>
+  layout_tags("A")
+```
+
+With `horizontal_align = "justify"`, all lines but the last are spread to the width of the widest line.
+
+For plots of similar width, such as small multiples, `new_grid(..., wrap = <mm>)` picks as many grid columns as fit. All rows share the same columns, so the plots line up in both directions.
+
+```{r wrap-grid, fig.asp = 0.7}
+small <- lapply(1:7, function(i) dummy(width = 30, height = 20, name = paste0("p", i), color = cols[i]))
+
+new_grid(small, wrap = 120) |>
+  layout_tags("A")
 ```
 
 ## Layout options
 
 ```{r options, fig.asp = 0.7}
-row(narrow, wide) |>
-  add_below(stretch_x(narrow)) |>
+new_row(narrow, wide) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("a") |>
   layout_title("Figure 1") |>
   layout_size(width = 120)
@@ -230,16 +261,16 @@ row(narrow, wide) |>
 To let several plots share one tag, wrap them in `tag_group()`. Only the first plot of the group gets a tag, and the sequence continues after the group.
 
 ```{r tag-group, fig.asp = 0.7}
-tag_group(row(narrow, wide)) |>
-  add_below(stretch_x(narrow)) |>
+tag_group(new_row(narrow, wide)) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("A")
 ```
 
 By default, the gaps between plots come from each plot's own margins. `layout_spacing()` replaces them with fixed gaps in mm, so spacing stays even when plots use different themes. `inner` takes one value for both directions or `c(horizontal, vertical)`; `outer` adds a margin around the whole figure.
 
 ```{r spacing, fig.asp = 0.7}
-row(narrow, wide) |>
-  add_below(stretch_x(narrow)) |>
+new_row(narrow, wide) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("a") |>
   layout_spacing(inner = c(2, 6), outer = 5)
 ```
@@ -256,6 +287,6 @@ save_layout(my_layout, "figure1.pdf", width = 183)  # Nature double column
 `dummy()` creates placeholder plots for sketching layouts. `spacer()` creates an empty slot: with a size in mm it is a fixed gap, without a size it absorbs leftover space.
 
 ```{r placeholders, fig.asp = 0.3}
-row(p1, spacer(width = 20), p1)
-row(p1, spacer(), p1) |> layout_size(width = 150)
+new_row(p1, spacer(width = 20), p1)
+new_row(p1, spacer(), p1) |> layout_size(width = 150)
 ```

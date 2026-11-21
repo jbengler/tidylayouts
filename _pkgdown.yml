@@ -16,24 +16,19 @@ reference:
     Then, define a base layout and progressively expand and adjust it.
     Plots are aligned by their panels.
 - contents:
-  - row
+  - new_row
   - layout_plots
-- title: Extend
+- title: Size and margins
   desc: >
-    Add plots to the right of or below a layout.
+    Panel sizes are fixed with `set_size()`, or decided by the layout with `auto_width()`
+    and `auto_height()`. `auto_margins()` centers a plot in the spare space next to it.
 - contents:
-  - starts_with("add_")
-- title: Stretch and center
-  desc: >
-    Panel sizes are set on the plot (`tidyplots::adjust_size()` or `theme(panel.widths)`).
-    A plot can take the spare space next to it, either stretching its panel or staying centered.
-- contents:
-  - stretch_x
+  - auto_width
 - title: Adjust
   desc: >
     Options for the whole figure.
 - contents:
-  - starts_with("layout_")
+  - starts_with("layout_s")
   - tag_group
 - title: Save
 - contents:

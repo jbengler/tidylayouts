@@ -10,17 +10,17 @@
 #'
 #' The design describes the arrangement, not the size: plots keep their own
 #' panel sizes, also when they span several cells. To let a plot fill the
-#' space it spans, list it in `stretch_x` or `stretch_y` (or center it with
-#' `center_x`/`center_y`). Designs that can't be split along full rows and
+#' space it spans, list it in `auto_width` or `auto_height` (or center it
+#' with `auto_margins_x`/`auto_margins_y`). Designs that can't be split along full rows and
 #' columns (e.g. a pinwheel) are not supported.
 #'
 #' **Arrangement.** The design is split along full rows and columns that no
 #' plot crosses. Blocks of plots without spanning plots are built according
 #' to `arrange_by`. With `"row"` (default), each line of the design becomes a
-#' [row()], so `"AB\nCD"` is the same as
-#' `row(A, B) |> add_below(row(C, D))`: each line is laid out on its own. With
-#' `"column"`, each design column becomes a [column()]. With `"grid"`, the
-#' block becomes a [grid()], so plots in the same row and column of the
+#' row, so `"AB\nCD"` is the same as
+#' `new_row(A, B) |> new_row(C, D)`: each line is laid out on its own. With
+#' `"column"`, each design column becomes a column. With `"grid"`, the
+#' block becomes a grid (see [new_grid()]), so plots in the same row and column of the
 #' design share their lines.
 #'
 #' **Plot order.** Plots in `...` are assigned in alphabetical order of the
@@ -31,7 +31,7 @@
 #' them through [tag_group()], e.g. `layout_plots(tag_group(p1, p2), p3, ...)`.
 #'
 #' The result is a normal layout, so it can be extended and adjusted with
-#' [add_right()], [layout_spacing()] etc.
+#' [new_row()], [layout_spacing()] etc.
 #'
 #' @param ... ggplots, grobs or layouts, in the order described above. Lists
 #'   are spliced.
@@ -41,10 +41,11 @@
 #'   column) or `"grid"` (shared rows and columns).
 #' @param tags Panel tags, as in [layout_tags()]: `"A"`, `"a"`, `"1"`, `"I"`,
 #'   `"i"` or a character vector. `NULL` (default) adds no tags.
-#' @param stretch_x,stretch_y Letters of plots whose panel stretches to
-#'   the available width or height (see [stretch_x()]), e.g. `"EF"`.
-#' @param center_x,center_y Letters of plots that keep their panel size and
-#'   are centered in the available width or height (see [center_x()]).
+#' @param auto_width,auto_height Letters of plots whose panel size is
+#'   decided by the layout (see [auto_width()]), e.g. `"EF"`.
+#' @param auto_margins_x,auto_margins_y Letters of plots that keep their
+#'   panel size and are centered horizontally or vertically in the available
+#'   space (see [auto_margins()]).
 #'
 #' @returns A layout.
 #'
@@ -58,8 +59,8 @@
 #'     CDEF
 #'     GGGG
 #'   ",
-#'   stretch_x = "G",
-#'   stretch_y = "EF",
+#'   auto_width = "G",
+#'   auto_height = "EF",
 #'   tags = "A"
 #' )
 #'
@@ -71,14 +72,14 @@
 #'     D##
 #'   ",
 #'   tags = "A",
-#'   center_x = "D"
+#'   auto_margins_x = "D"
 #' )
 #'
 #' @export
 layout_plots <- function(..., design, arrange_by = c("row", "column", "grid"),
                          tags = NULL,
-                         stretch_x = NULL, stretch_y = NULL,
-                         center_x = NULL, center_y = NULL) {
+                         auto_width = NULL, auto_height = NULL,
+                         auto_margins_x = NULL, auto_margins_y = NULL) {
   arrange_by <- match.arg(arrange_by)
   cells <- parse_design(design)
   ids <- design_ids(cells)
@@ -94,10 +95,10 @@ layout_plots <- function(..., design, arrange_by = c("row", "column", "grid"),
   names(plots) <- ids$order
 
   modifiers <- list(
-    stretch_x = letters_of(stretch_x, "stretch_x", cells),
-    stretch_y = letters_of(stretch_y, "stretch_y", cells),
-    center_x = letters_of(center_x, "center_x", cells),
-    center_y = letters_of(center_y, "center_y", cells)
+    stretch_x = letters_of(auto_width, "auto_width", cells),
+    stretch_y = letters_of(auto_height, "auto_height", cells),
+    center_x = letters_of(auto_margins_x, "auto_margins_x", cells),
+    center_y = letters_of(auto_margins_y, "auto_margins_y", cells)
   )
   both <- c(
     intersect(modifiers$stretch_x, modifiers$center_x),
@@ -106,7 +107,7 @@ layout_plots <- function(..., design, arrange_by = c("row", "column", "grid"),
   if (length(both) > 0) {
     stop(
       "Plot(s) ", paste(unique(both), collapse = ", "),
-      " can't be both stretched and centered in the same direction.",
+      " can't have both an automatic size and automatic margins in the same direction.",
       call. = FALSE
     )
   }
@@ -232,7 +233,7 @@ build_design <- function(ids, plots, arrange_by = "row") {
   }
   stop(
     "This design can't be split into rows and columns. ",
-    "Arrange such plots with nested `row()`/`column()` calls instead.",
+    "Arrange such plots with `new_row()`/`new_column()` instead.",
     call. = FALSE
   )
 }

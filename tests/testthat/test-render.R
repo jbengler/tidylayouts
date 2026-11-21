@@ -7,7 +7,7 @@ mtcars_plot <- function(ylab = "mpg") {
 test_that("real ggplots align by panel edges", {
   a <- fix(mtcars_plot(), width = 30, height = 30)
   b <- fix(mtcars_plot("a much\nlonger\ny label") + ggplot2::scale_y_continuous(labels = function(x) paste0(x, " units")), width = 30, height = 30)
-  res <- solve_real(column(a, b))
+  res <- solve_real(tl_column(a, b))
   pl <- res$sol$placement
   expect_equal(pl$leaf1$x$start, pl$leaf2$x$start)
   expect_gt(res$leaves$leaf2$meas$x$lead, res$leaves$leaf1$meas$x$lead)
@@ -16,7 +16,7 @@ test_that("real ggplots align by panel edges", {
 test_that("free ggplot panels and facets get the assigned span", {
   a <- fix(mtcars_plot(), width = 30, height = 30)
   f <- mtcars_plot() + ggplot2::facet_wrap(~cyl)
-  res <- solve_real(row(a, a) |> add_below(fix(f, height = 30)))
+  res <- solve_real(tl_row(a, a) |> below(fix(f, height = 30)))
   leaf <- res$leaves$leaf3
   expect_true(leaf$meas$x$flex)
   pl <- res$sol$placement$leaf3
@@ -25,8 +25,8 @@ test_that("free ggplot panels and facets get the assigned span", {
 })
 
 test_that("layouts print and save", {
-  l <- row(dummy(), dummy()) |>
-    add_below(dummy(width = NA)) |>
+  l <- tl_row(dummy(), dummy()) |>
+    below(dummy(width = NA)) |>
     layout_tags("A") |>
     layout_title("Title")
   grDevices::pdf(NULL)
@@ -37,8 +37,8 @@ test_that("layouts print and save", {
   size <- save_layout(l, file)
   expect_true(file.exists(file))
   expect_length(size, 2)
-  expect_error(save_layout(row(dummy(), dummy(width = NA)), file), "free panels")
-  expect_no_error(save_layout(row(dummy(), dummy(width = NA)), file, width = 120))
+  expect_error(save_layout(tl_row(dummy(), dummy(width = NA)), file), "free panels")
+  expect_no_error(save_layout(tl_row(dummy(), dummy(width = NA)), file, width = 120))
 })
 
 test_that("tag labels", {
@@ -52,10 +52,10 @@ test_that("layout_spacing replaces plot margins", {
   a <- fix(mtcars_plot(), width = 30, height = 30)
   margin <- 5.5 * 25.4 / 72.27  # 5.5 pt in mm
 
-  res <- solve_real(row(a, a))
+  res <- solve_real(tl_row(a, a))
   without <- res$sol$placement$leaf2$x$start - res$sol$placement$leaf1$x$start
 
-  res <- solve_real(row(a, a) |> layout_spacing(inner = c(4, NA)))
+  res <- solve_real(tl_row(a, a) |> layout_spacing(inner = c(4, NA)))
   with <- res$sol$placement$leaf2$x$start - res$sol$placement$leaf1$x$start
   expect_equal(without - with, 2 * margin - 4, tolerance = 1e-6)
   # vertical margins untouched
@@ -64,7 +64,7 @@ test_that("layout_spacing replaces plot margins", {
 })
 
 test_that("layout_spacing sets, keeps and unsets options", {
-  l <- row(dummy()) |> layout_spacing(3)
+  l <- tl_row(dummy()) |> layout_spacing(3)
   expect_equal(l$opts$spacing, list(horizontal = 3, vertical = 3))
   l <- l |> layout_spacing(inner = c(2, 6), outer = 2)
   expect_equal(l$opts$spacing, list(horizontal = 2, vertical = 6, outer = 2))
@@ -82,7 +82,7 @@ test_that("layout_spacing sets, keeps and unsets options", {
 })
 
 test_that("spacing layouts print and save", {
-  l <- row(dummy(), dummy()) |> layout_tags("A") |> layout_title("T") |>
+  l <- tl_row(dummy(), dummy()) |> layout_tags("A") |> layout_title("T") |>
     layout_spacing(inner = 2, outer = 4)
   file <- withr::local_tempfile(fileext = ".png")
   size <- save_layout(l, file)
@@ -92,7 +92,7 @@ test_that("spacing layouts print and save", {
 test_that("plot gtables are built once per print and reused on redraw", {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
-  l <- row(dummy(), dummy(width = NA))
+  l <- tl_row(dummy(), dummy(width = NA))
   g <- tidylayouts:::layout_grob(l)
   leaves <- tidylayouts:::layout_leaves(g$layout)
   expect_true(all(vapply(leaves, function(x) inherits(x$gtable, "gtable"), logical(1))))
@@ -102,7 +102,7 @@ test_that("plot gtables are built once per print and reused on redraw", {
   expect_true(all(vapply(leaves, function(x) is.null(x$plot), logical(1))))
   # changing sizes drops a cached gtable
   cached <- tidylayouts:::build_gtables(l)
-  freed <- stretch_y(cached)
+  freed <- auto_height(cached)
   expect_null(tidylayouts:::layout_leaves(freed)[[1]]$gtable)
   expect_false(is.null(tidylayouts:::layout_leaves(freed)[[1]]$plot))
   expect_no_error({grid::grid.newpage(); grid::grid.draw(g); grid::grid.draw(g)})
@@ -123,19 +123,19 @@ test_that("save_layout leaves the previously active device current", {
   }, add = TRUE)
   grDevices::dev.set(first)
 
-  save_layout(row(dummy(), dummy()), out)
+  save_layout(tl_row(dummy(), dummy()), out)
   expect_equal(grDevices::dev.cur(), first)
   expect_equal(sort(grDevices::dev.list()), sort(c(before, first, second)))
 
-  expect_error(save_layout(row(dummy(), dummy(width = NA)), out), "free panels")
+  expect_error(save_layout(tl_row(dummy(), dummy(width = NA)), out), "free panels")
   expect_equal(grDevices::dev.cur(), first)
   expect_equal(sort(grDevices::dev.list()), sort(c(before, first, second)))
 })
 
 test_that("centered plots render in the middle of their slot, tag at the edge", {
   wide <- dummy(width = 50)
-  l <- row(wide, wide) |>
-    add_below(row(dummy(), center_x(dummy()))) |>
+  l <- tl_row(wide, wide) |>
+    below(tl_row(dummy(), auto_margins(dummy(), y = FALSE))) |>
     layout_tags("A")
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
@@ -160,7 +160,7 @@ test_that("centered plots render in the middle of their slot, tag at the edge", 
 
 test_that("plot backgrounds are drawn before all plots", {
   a <- fix(mtcars_plot(), width = 30, height = 30)
-  l <- row(a, a, a)
+  l <- tl_row(a, a, a)
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off())
   g <- tidylayouts:::layout_grob(l)

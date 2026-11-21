@@ -6,14 +6,14 @@
 #' sequence. Tags are added with [layout_tags()].
 #'
 #' The plots of a group are usually arranged together, e.g.
-#' `tag_group(row(p1, p2))`. Several plots can also be passed directly:
-#' `row(tag_group(p1, p2), p3)`.
+#' `tag_group(new_row(p1, p2))`. Several plots can also be passed directly:
+#' `new_row(tag_group(p1, p2), p3)`.
 #'
 #' @param ... ggplots, grobs, layouts, or lists of them. All of them form
 #'   one group.
 #'
 #' @returns The modified plot or layout if one object was supplied, otherwise
-#'   a list. Layout functions such as [row()] splice such lists.
+#'   a list. Layout functions such as [new_row()] splice such lists.
 #'
 #' @examples
 #' p1 <- dummy(name = "p1", color = "#0072B2")
@@ -21,11 +21,11 @@
 #' p3 <- dummy(name = "p3", color = "#009E73")
 #'
 #' # p1 and p2 share tag A, p3 gets B
-#' tag_group(row(p1, p2)) |>
-#'   add_below(p3) |>
+#' tag_group(new_row(p1, p2)) |>
+#'   new_row(p3) |>
 #'   layout_tags("A")
 #'
-#' row(tag_group(p1, p2), p3) |>
+#' new_row(tag_group(p1, p2), p3) |>
 #'   layout_tags("A")
 #'
 #' @export

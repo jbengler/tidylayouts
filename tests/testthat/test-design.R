@@ -1,15 +1,5 @@
 plots <- function(n) lapply(seq_len(n), function(i) dummy(name = paste0("p", i)))
 
-structure_of <- function(node) {
-  if (!tidylayouts:::is_container(node)) {
-    if (node$type == "spacer") return("#")
-    return(node$plot$layers[[1]]$aes_params$label)
-  }
-  inner <- vapply(node$children, structure_of, character(1))
-  extra <- if (node$type == "grid") paste0("[", node$ncol, "]") else ""
-  paste0(node$type, extra, "(", paste(inner, collapse = ", "), ")")
-}
-
 test_that("designs are built line by line by default", {
   d <- "
     ABEF
@@ -28,12 +18,12 @@ test_that("designs are built line by line by default", {
   )
 })
 
-test_that("line-by-line designs match the pipe API", {
+test_that("line-by-line designs match nested rows and columns", {
   p <- plots(7)
-  piped <- row(p[[1]], p[[2]]) |>
-    add_below(row(p[[3]], p[[4]])) |>
-    add_right(p[[5]], p[[6]]) |>
-    add_below(p[[7]])
+  piped <- tl_row(p[[1]], p[[2]]) |>
+    below(tl_row(p[[3]], p[[4]])) |>
+    beside(p[[5]], p[[6]]) |>
+    below(p[[7]])
   expect_equal(
     structure_of(layout_plots(p, design = "ABEF\nCDEF\nGGGG")),
     structure_of(piped)
@@ -92,12 +82,12 @@ test_that("tag_group() inputs share one tag", {
 
 test_that("spanning keeps sizes, modifiers stretch or center", {
   l <- layout_plots(plots(7), design = "ABEF\nCDEF\nGGGG",
-                    stretch_x = "A", center_x = "D", center_y = "F")
+                    auto_width = "A", auto_margins_x = "D", auto_margins_y = "F")
   leaves <- tidylayouts:::layout_leaves(l)
   names(leaves) <- vapply(leaves, function(x) x$plot$layers[[1]]$aes_params$label, "")
   theme_of <- function(id, el) leaves[[id]]$plot$theme[[el]]
-  expect_null(theme_of("p1", "panel.widths"))                       # stretch_x = "A"
-  expect_true(isTRUE(leaves$p4$center[["x"]]))                      # center_x = "D"
+  expect_null(theme_of("p1", "panel.widths"))                       # auto_width = "A"
+  expect_true(isTRUE(leaves$p4$center[["x"]]))                      # auto_margins_x = "D"
   expect_false(is.null(theme_of("p5", "panel.heights")))            # E spans rows, kept
   expect_false(isTRUE(leaves$p5$center[["y"]]))
   expect_false(is.null(theme_of("p6", "panel.heights")))            # F centered
@@ -108,7 +98,7 @@ test_that("spanning keeps sizes, modifiers stretch or center", {
 
 test_that("spanning plots stretch when listed", {
   l <- layout_plots(plots(7), design = "ABEF\nCDEF\nGGGG",
-                    stretch_x = "G", stretch_y = "EF")
+                    auto_width = "G", auto_height = "EF")
   leaves <- tidylayouts:::layout_leaves(l)
   names(leaves) <- vapply(leaves, function(x) x$plot$layers[[1]]$aes_params$label, "")
   expect_null(leaves$p5$plot$theme$panel.heights)
@@ -117,7 +107,7 @@ test_that("spanning plots stretch when listed", {
 })
 
 test_that("layouts can be used as plots", {
-  inner <- row(dummy(name = "i1"), dummy(name = "i2"))
+  inner <- tl_row(dummy(name = "i1"), dummy(name = "i2"))
   l <- layout_plots(inner, dummy(name = "x"), design = "AB")
   expect_equal(structure_of(l), "row(row(i1, i2), x)")
   l <- layout_plots(tag_group(inner), dummy(name = "x"), design = "AB")
@@ -130,10 +120,10 @@ test_that("invalid designs give clear errors", {
   expect_error(layout_plots(plots(2), design = "A-B"), "only contain letters")
   expect_error(layout_plots(plots(2), design = "AB\nBA"), "rectangle")
   expect_error(layout_plots(plots(1), design = "AB"), "2 plots")
-  expect_error(layout_plots(plots(2), design = "AB", stretch_x = "Z"), "not in the design")
+  expect_error(layout_plots(plots(2), design = "AB", auto_width = "Z"), "not in the design")
   expect_error(
-    layout_plots(plots(2), design = "AB", stretch_x = "A", center_x = "A"),
-    "both stretched and centered"
+    layout_plots(plots(2), design = "AB", auto_width = "A", auto_margins_x = "A"),
+    "both an automatic size and automatic margins"
   )
   # pinwheel: no full cut in either direction
   expect_error(
@@ -144,7 +134,7 @@ test_that("invalid designs give clear errors", {
 
 test_that("design layouts render", {
   l <- layout_plots(tag_group(plots(2)), plots(2), design = "AB\nCD",
-                    tags = "A", center_x = "C")
+                    tags = "A", auto_margins_x = "C")
   file <- withr::local_tempfile(fileext = ".png")
   expect_no_error(save_layout(l, file))
 })

@@ -12,7 +12,7 @@ one group.}
 }
 \value{
 The modified plot or layout if one object was supplied, otherwise
-a list. Layout functions such as \code{\link[=row]{row()}} splice such lists.
+a list. Layout functions such as \code{\link[=new_row]{new_row()}} splice such lists.
 }
 \description{
 \code{tag_group()} makes several plots share a single panel tag. The first plot
@@ -22,8 +22,8 @@ sequence. Tags are added with \code{\link[=layout_tags]{layout_tags()}}.
 }
 \details{
 The plots of a group are usually arranged together, e.g.
-\code{tag_group(row(p1, p2))}. Several plots can also be passed directly:
-\code{row(tag_group(p1, p2), p3)}.
+\code{tag_group(new_row(p1, p2))}. Several plots can also be passed directly:
+\code{new_row(tag_group(p1, p2), p3)}.
 }
 \examples{
 p1 <- dummy(name = "p1", color = "#0072B2")
@@ -31,11 +31,11 @@ p2 <- dummy(name = "p2", color = "#D55E00")
 p3 <- dummy(name = "p3", color = "#009E73")
 
 # p1 and p2 share tag A, p3 gets B
-tag_group(row(p1, p2)) |>
-  add_below(p3) |>
+tag_group(new_row(p1, p2)) |>
+  new_row(p3) |>
   layout_tags("A")
 
-row(tag_group(p1, p2), p3) |>
+new_row(tag_group(p1, p2), p3) |>
   layout_tags("A")
 
 }

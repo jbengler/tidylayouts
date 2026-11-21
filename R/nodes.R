@@ -28,7 +28,7 @@ as_node <- function(x, call = parent.frame()) {
   )
 }
 
-# Flatten `...` into a list of nodes. Plain lists (e.g. from `stretch_y(p1, p2)`)
+# Flatten `...` into a list of nodes. Plain lists (e.g. from `auto_height(p1, p2)`)
 # are spliced. `NULL` is dropped, or kept as an empty cell if `keep_null = TRUE`.
 collect_items <- function(dots, keep_null = FALSE) {
   out <- list()
@@ -72,76 +72,13 @@ new_container <- function(type, children, horizontal_align, vertical_align, ...)
   )
 }
 
-#' Arrange plots in rows, columns and grids
-#'
-#' `row()` places plots side by side, `column()` stacks them, and `grid()`
-#' arranges them in a table with shared row and column tracks.
-#'
-#' Plots are aligned by their panel edges, not by their outer boxes. Within a
-#' row, panel bottoms line up by default (so do the x axes); within a column,
-#' panel left edges line up (so do the y axes).
-#'
-#' **Alignment.** When plots have a fixed size, a container often has more
-#' space than its plots need. `horizontal_align` and `vertical_align` decide
-#' where that space goes *inside this container*: they place its direct plots
-#' and spread space between them. Nested rows, columns and grids always fill
-#' the space they are given and arrange their own contents with their own
-#' alignment. For example, in
-#' `row(p1, p2) |> add_below(row(p3, p4, horizontal_align = "justify"))`
-#' the lower row spans the full width of the upper row, with the extra space
-#' between `p3` and `p4`.
-#'
-#' `column(row(p1, p2), row(p3, p4))` is not the same as
-#' `grid(p1, p2, p3, p4, ncol = 2)`: in the column of rows, each row is laid
-#' out independently, so `p2` and `p4` need not line up. In the grid, every
-#' grid column is as wide as its widest panel, so `p2` sits exactly above `p4`.
-#'
-#' @param ... ggplots (including tidyplots), grobs or layouts. Lists are
-#'   spliced, so the output of [stretch_y()] can be passed directly. In
-#'   `row()` and `column()`, `NULL` is ignored; in `grid()`, `NULL` leaves an
-#'   empty cell.
-#' @param horizontal_align Where leftover horizontal space in this container
-#'   goes: `"left"` (default), `"right"`, `"center"` or `"justify"` (between
-#'   its plots).
-#' @param vertical_align Where leftover vertical space in this container
-#'   goes: `"bottom"` (default), `"top"`, `"center"` or `"justify"` (between
-#'   its plots).
-#' @param ncol,nrow Number of grid columns and rows. Cells are filled
-#'   row-wise.
-#'
-#' @returns A layout.
-#'
-#' @examples
-#' p1 <- dummy(name = "p1", color = "#0072B2")
-#' p2 <- dummy(name = "p2", color = "#D55E00")
-#' p3 <- dummy(name = "p3", color = "#009E73", width = 45)
-#'
-#' row(p1, p2)
-#' column(p1, p3)
-#' column(p1, p3, horizontal_align = "center")
-#' grid(p1, p2, p3, p1, ncol = 2)
-#'
-#' # nested rows fill the available width and use their own alignment
-#' row(p3, p3) |> add_below(row(p1, p2, horizontal_align = "justify"))
-#'
-#' @export
-row <- function(..., horizontal_align = "left", vertical_align = "bottom") {
-  new_container("row", collect_items(list(...)), horizontal_align, vertical_align)
-}
+# Internal constructors ------------------------------------------------------
 
-#' @rdname row
-#' @export
-column <- function(..., horizontal_align = "left", vertical_align = "bottom") {
-  new_container("column", collect_items(list(...)), horizontal_align, vertical_align)
-}
-
-#' @rdname row
-#' @export
-grid <- function(..., ncol = NULL, nrow = NULL,
-                 horizontal_align = "left", vertical_align = "bottom") {
-  children <- collect_items(list(...), keep_null = TRUE)
+make_grid <- function(items, ncol = NULL, nrow = NULL,
+                      horizontal_align = "left", vertical_align = "bottom") {
+  children <- collect_items(items, keep_null = TRUE)
   n <- length(children)
-  if (n == 0) stop("`grid()` needs at least one plot.", call. = FALSE)
+  if (n == 0) stop("`new_grid()` needs at least one plot.", call. = FALSE)
   if (is.null(ncol) && is.null(nrow)) {
     ncol <- ceiling(sqrt(n))
   }
@@ -157,51 +94,187 @@ grid <- function(..., ncol = NULL, nrow = NULL,
   )
 }
 
-#' Extend a layout
+#' Build a layout row by row
 #'
-#' `add_right()` places plots to the right of a layout, `add_below()` places
-#' them below.
+#' `new_row()` adds a row of plots below everything built so far,
+#' `new_column()` adds a column of plots to the right of it, and `new_grid()`
+#' adds a grid of plots below it. Together they build a figure step by step:
 #'
-#' If the layout is already a row (for `add_right()`) or a column (for
-#' `add_below()`), the plots are appended to it. Otherwise, including for
-#' grids, the layout is wrapped in a new row or column together with the new
-#' plots.
+#' ```r
+#' new_row(p1, p2) |>
+#'   new_row(p3, p4) |>
+#'   new_column(p5) |>
+#'   new_column(p6) |>
+#'   new_row(p7)
+#' ```
 #'
-#' @param layout A layout, ggplot or grob.
-#' @inheritParams row
-#' @param horizontal_align,vertical_align Alignment of the resulting row or
-#'   column, i.e. where it places its direct plots (see [row()]). To align the
-#'   plots inside a nested row or column, set the alignment on that row or
-#'   column instead. `NULL` keeps the current alignment when appending, and
-#'   uses the default (`"left"`, `"bottom"`) when wrapping.
+#' **Starting and adding.** If the first argument is a layout, the new row
+#' (column, grid) is added to it. Otherwise, a new layout is started, so
+#' `new_row(p1, p2)` is simply a row of `p1` and `p2`. To start a new row
+#' with an existing layout as its first element, wrap it in a list:
+#' `new_row(list(inner), p3)`. Several plots in one call form one row
+#' (column): `new_column(p5, p6)` is a single column with `p6` below `p5`,
+#' whereas `new_column(p5) |> new_column(p6)` gives two columns side by side.
+#' Layouts can also be passed as elements, e.g. `new_column(new_grid(...))`
+#' puts a grid to the right.
+#'
+#' **Panel alignment.** Plots are aligned by their panel edges, not by their
+#' outer boxes. Within a row, panel bottoms line up by default (so do the x
+#' axes); within a column, panel left edges line up (so do the y axes).
+#'
+#' **Rows vs. grids.** Each row is laid out on its own: in
+#' `new_row(p1, p2) |> new_row(p3, p4)`, the rows line up at the left edge of
+#' their outermost panels, but `p2` and `p4` need not line up. In
+#' `new_grid(p1, p2, p3, p4, ncol = 2)`, every grid column is as wide as its
+#' widest panel, so `p2` sits exactly above `p4`. In a grid, `NULL` leaves an
+#' empty cell.
+#'
+#' **Spare space.** When plots have a fixed size, a row (column, grid) often
+#' has more space than its plots need. `horizontal_align` and
+#' `vertical_align` decide where that space goes *inside this row*: they
+#' place its plots and spread space between them. Nested rows, columns and
+#' grids always fill the space they are given and arrange their own contents
+#' with their own alignment. For example, in
+#' `new_row(p1, p2) |> new_row(p3, p4, horizontal_align = "justify")`
+#' the lower row spans the full width of the upper row, with the extra space
+#' between `p3` and `p4`.
+#'
+#' @param ... A layout (optional, first) followed by ggplots (including
+#'   tidyplots), grobs or layouts. Lists are spliced, so the output of
+#'   [auto_height()] can be passed directly.
+#' @param horizontal_align Where leftover horizontal space in the new row
+#'   (column, grid) goes: `"left"` (default), `"right"`, `"center"` or
+#'   `"justify"` (between its plots).
+#' @param vertical_align Where leftover vertical space goes: `"bottom"`
+#'   (default), `"top"`, `"center"` or `"justify"` (between its plots).
+#' @param ncol,nrow Number of grid columns and rows. Cells are filled
+#'   row-wise.
+#' @param wrap Maximum width in mm (axis labels, legends and gaps
+#'   included). `NULL` (default) never wraps.
+#'   * In `new_row()`, a row that doesn't fit is broken into several lines,
+#'     like text in a word processor: each line takes as many plots as fit
+#'     and is laid out on its own. `horizontal_align` applies to every line;
+#'     with `"justify"` all lines but the last are spread to the width of the
+#'     widest line. Best for plots of different widths.
+#'   * In `new_grid()`, the number of columns is chosen as large as possible
+#'     while the grid fits. All rows share the same columns, so this is best
+#'     for plots of similar widths (small multiples). Can't be combined with
+#'     `ncol` or `nrow`.
+#'
+#'   A plot wider than `wrap` gets a line (column) of its own.
 #'
 #' @returns A layout.
 #'
 #' @examples
 #' p1 <- dummy(name = "p1", color = "#0072B2")
 #' p2 <- dummy(name = "p2", color = "#D55E00")
-#' p3 <- dummy(name = "p3", color = "#009E73", height = NA)
-#' p4 <- dummy(name = "p4", color = "#E69F00", width = NA)
+#' p3 <- dummy(name = "p3", color = "#009E73")
+#' p4 <- dummy(name = "p4", color = "#E69F00")
+#' p5 <- dummy(name = "p5", color = "#56B4E9", height = NA)
+#' p6 <- dummy(name = "p6", color = "#F5C710", height = NA)
+#' p7 <- dummy(name = "p7", color = "#DD227D", width = NA)
+#' wide <- dummy(name = "wide", color = "#009E73", width = 45)
 #'
-#' row(p1, p2) |>
-#'   add_right(p3) |>
-#'   add_below(p4)
+#' new_row(p1, p2) |>
+#'   new_row(p3, p4) |>
+#'   new_column(p5) |>
+#'   new_column(p6) |>
+#'   new_row(p7)
+#'
+#' new_grid(p1, p2, p3, p4, ncol = 2) |>
+#'   new_column(p5) |>
+#'   new_row(p7)
+#'
+#' # break a long row into lines of at most 100 mm
+#' new_row(p1, p2, p3, p4, p1, p2, wrap = 100)
+#'
+#' # as many grid columns as fit into 100 mm
+#' new_grid(p1, p2, p3, p4, p1, p2, wrap = 100)
+#'
+#' # alignment inside a row or column
+#' new_column(wide, p1, horizontal_align = "center")
+#' new_row(wide, wide) |>
+#'   new_row(p1, p2, horizontal_align = "justify")
 #'
 #' @export
-add_right <- function(layout, ..., horizontal_align = NULL, vertical_align = NULL) {
-  extend_layout(layout, "row", list(...), horizontal_align, vertical_align)
+new_row <- function(..., wrap = NULL, horizontal_align = "left",
+                    vertical_align = "bottom") {
+  check_wrap(wrap)
+  new_line(list(...), "row", horizontal_align, vertical_align, wrap = wrap)
 }
 
-#' @rdname add_right
+#' @rdname new_row
 #' @export
-add_below <- function(layout, ..., horizontal_align = NULL, vertical_align = NULL) {
-  extend_layout(layout, "column", list(...), horizontal_align, vertical_align)
+new_column <- function(..., horizontal_align = "left", vertical_align = "bottom") {
+  new_line(list(...), "column", horizontal_align, vertical_align)
 }
 
+#' @rdname new_row
+#' @export
+new_grid <- function(..., ncol = NULL, nrow = NULL, wrap = NULL,
+                     horizontal_align = "left", vertical_align = "bottom") {
+  dots <- list(...)
+  check_wrap(wrap)
+  if (!is.null(wrap) && (!is.null(ncol) || !is.null(nrow))) {
+    stop("Use either `wrap` or `ncol`/`nrow` in `new_grid()`, not both.", call. = FALSE)
+  }
+  build <- function(items) {
+    if (is.null(wrap)) {
+      return(make_grid(items, ncol = ncol, nrow = nrow,
+                       horizontal_align = horizontal_align,
+                       vertical_align = vertical_align))
+    }
+    # one row for now; the number of columns is chosen after measuring
+    n <- length(collect_items(items, keep_null = TRUE))
+    g <- make_grid(items, ncol = max(n, 1), nrow = 1,
+                   horizontal_align = horizontal_align, vertical_align = vertical_align)
+    g$wrap <- wrap
+    g
+  }
+  if (length(dots) == 0) stop("`new_grid()` needs at least one plot.", call. = FALSE)
+  first <- dots[[1]]
+  if (!is_tidylayout(first) || !is_container(first)) return(build(dots))
+  if (length(dots) == 1) {
+    stop("`new_grid()` needs at least one plot to add.", call. = FALSE)
+  }
+  # like a new row: the grid goes below everything built so far
+  extend_layout(first, "column", list(build(dots[-1])), NULL, NULL)
+}
+
+new_line <- function(dots, type, horizontal_align, vertical_align, wrap = NULL) {
+  if (length(dots) == 0) {
+    stop("`new_", type, "()` needs at least one plot.", call. = FALSE)
+  }
+  first <- dots[[1]]
+  if (!is_tidylayout(first) || !is_container(first)) {
+    return(new_container(type, collect_items(dots), horizontal_align, vertical_align,
+                         wrap = wrap))
+  }
+  items <- collect_items(dots[-1])
+  if (length(items) == 0) {
+    stop("`new_", type, "()` needs at least one plot to add.", call. = FALSE)
+  }
+  line <- new_container(type, items, horizontal_align, vertical_align, wrap = wrap)
+  # a new row goes below everything (column), a new column to the right (row)
+  outer <- if (type == "row") "column" else "row"
+  extend_layout(first, outer, list(line), NULL, NULL)
+}
+
+check_wrap <- function(wrap) {
+  if (!is.null(wrap) &&
+      (!is.numeric(wrap) || length(wrap) != 1 || is.na(wrap) || wrap <= 0)) {
+    stop("`wrap` must be a positive width in mm, or NULL.", call. = FALSE)
+  }
+  invisible()
+}
+
+# Append `dots` to `layout` if it is a container of `type`; otherwise wrap
+# both in a new container of `type`. Layout options stay with the root.
 extend_layout <- function(layout, type, dots, horizontal_align, vertical_align) {
   layout <- as_node(layout)
   items <- collect_items(dots)
-  if (identical(layout$type, type)) {
+  # a wrapping row is a closed block: never append to it
+  if (identical(layout$type, type) && is.null(layout$wrap)) {
     layout$children <- c(layout$children, items)
     if (!is.null(horizontal_align)) {
       layout$align$x <- check_align(horizontal_align, horizontal_values, "horizontal_align")

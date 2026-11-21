@@ -52,6 +52,14 @@ row(p1, p2) |>
   add_below(p7) |>
   layout_tags("A")
 
+tidyplayout() |>
+  add_row(p1, p2) |>
+  add_row(p3, p4) |>
+  add_column(p5) |>
+  add_column(p6) |>
+  add_row(p7)
+
+
 row(p1, p2) |>
   add_below(row(p3, p4)) |>
   add_right(stretch_y(p5, p6)) |>
