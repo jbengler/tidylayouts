@@ -146,11 +146,12 @@ make_grid <- function(items, ncol = NULL, nrow = NULL,
 #'   (column, grid) goes: `"left"` (default), `"right"`, `"center"` or
 #'   `"justify"` (between its plots).
 #' @param vertical_align Where leftover vertical space goes: `"bottom"`
-#'   (default), `"top"`, `"center"` or `"justify"` (between its plots).
+#'   (default), `"top"`, `"center"` or `"justify"` (between its plots). For
+#'   `new_column()` with `wrap`, the default is `"top"`.
 #' @param ncol,nrow Number of grid columns and rows. Cells are filled
 #'   row-wise.
-#' @param wrap Maximum width in mm (axis labels, legends and gaps
-#'   included). `NULL` (default) never wraps.
+#' @param wrap Maximum width in mm (maximum height for `new_column()`),
+#'   axis labels, legends and gaps included. `NULL` (default) never wraps.
 #'   * In `new_row()`, a row that doesn't fit is broken into several lines,
 #'     like text in a word processor: each line takes as many plots as fit
 #'     and is laid out on its own. `horizontal_align` applies to every line;
@@ -160,8 +161,13 @@ make_grid <- function(items, ncol = NULL, nrow = NULL,
 #'     while the grid fits. All rows share the same columns, so this is best
 #'     for plots of similar widths (small multiples). Can't be combined with
 #'     `ncol` or `nrow`.
+#'   * In `new_column()`, a column that is too tall is broken into several
+#'     columns side by side, like newspaper columns. `vertical_align`
+#'     (default `"top"` here) applies within every column; with `"justify"`
+#'     all columns but the last are spread to the height of the tallest one.
+#'     Tags run down each column before moving to the next.
 #'
-#'   A plot wider than `wrap` gets a line (column) of its own.
+#'   A plot larger than `wrap` gets a line (column) of its own.
 #'
 #' @returns A layout.
 #'
@@ -191,6 +197,9 @@ make_grid <- function(items, ncol = NULL, nrow = NULL,
 #' # as many grid columns as fit into 100 mm
 #' new_grid(p1, p2, p3, p4, p1, p2, wrap = 100)
 #'
+#' # columns of at most 80 mm height
+#' new_column(p1, p2, p3, p4, p1, wrap = 80)
+#'
 #' # alignment inside a row or column
 #' new_column(wide, p1, horizontal_align = "center")
 #' new_row(wide, wide) |>
@@ -205,8 +214,12 @@ new_row <- function(..., wrap = NULL, horizontal_align = "left",
 
 #' @rdname new_row
 #' @export
-new_column <- function(..., horizontal_align = "left", vertical_align = "bottom") {
-  new_line(list(...), "column", horizontal_align, vertical_align)
+new_column <- function(..., wrap = NULL, horizontal_align = "left",
+                       vertical_align = NULL) {
+  check_wrap(wrap)
+  # wrapped columns read like newspaper columns: from the top
+  vertical_align <- vertical_align %||% if (is.null(wrap)) "bottom" else "top"
+  new_line(list(...), "column", horizontal_align, vertical_align, wrap = wrap)
 }
 
 #' @rdname new_row

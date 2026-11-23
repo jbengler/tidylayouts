@@ -39,6 +39,6 @@ free, set the size with \code{width}/\code{height} or \code{\link[=layout_size]{
 p1 <- dummy(name = "p1", color = "#0072B2")
 p2 <- dummy(name = "p2", color = "#D55E00")
 file <- tempfile(fileext = ".pdf")
-save_layout(row(p1, p2), file)
+save_layout(new_row(p1, p2), file)
 
 }

@@ -1,7 +1,8 @@
 #' Lay out plots from a design string
 #'
-#' `layout_plots()` describes a whole figure in one call: a design string
-#' shows where each plot goes.
+#' `new_layout()` describes a whole figure in one call: a design string
+#' shows where each plot goes. Unlike [new_row()], it always starts a new
+#' layout; an existing layout can be used as one of its plots.
 #'
 #' **Design.** Each line of `design` is a row of cells, each character a cell:
 #' * Each letter is one plot. A plot may cover several cells, which must form
@@ -28,7 +29,7 @@
 #'
 #' **Tags.** The letters only place the plots. Tags are numbered in reading
 #' order, as with [layout_tags()]. To let several plots share one tag, pass
-#' them through [tag_group()], e.g. `layout_plots(tag_group(p1, p2), p3, ...)`.
+#' them through [tag_group()], e.g. `new_layout(tag_group(p1, p2), p3, ...)`.
 #'
 #' The result is a normal layout, so it can be extended and adjusted with
 #' [new_row()], [layout_spacing()] etc.
@@ -52,7 +53,7 @@
 #' @examples
 #' p <- lapply(paste0("p", 1:7), function(x) dummy(name = x))
 #'
-#' layout_plots(
+#' new_layout(
 #'   p,
 #'   design = "
 #'     ABEF
@@ -65,7 +66,7 @@
 #' )
 #'
 #' # the first two plots share tag A; # is an empty cell
-#' layout_plots(
+#' new_layout(
 #'   tag_group(p[[1]], p[[2]]), p[[3]], p[[4]],
 #'   design = "
 #'     ABC
@@ -76,7 +77,7 @@
 #' )
 #'
 #' @export
-layout_plots <- function(..., design, arrange_by = c("row", "column", "grid"),
+new_layout <- function(..., design, arrange_by = c("row", "column", "grid"),
                          tags = NULL,
                          auto_width = NULL, auto_height = NULL,
                          auto_margins_x = NULL, auto_margins_y = NULL) {

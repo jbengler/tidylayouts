@@ -148,10 +148,10 @@ new_row(p1, p2) |>
 
 ## Design strings
 
-`layout_plots()` describes a whole figure in one call. Each letter in the design is a plot; plots are assigned in alphabetical order of the letters, and `#` marks an empty cell.
+`new_layout()` describes a whole figure in one call. Each letter in the design is a plot; plots are assigned in alphabetical order of the letters, and `#` marks an empty cell.
 
 ```{r design, fig.asp = 0.75}
-layout_plots(
+new_layout(
   tag_group(p1, p2), p3, p4, p5, p6, p7,
   design = "
     ABEF
@@ -238,6 +238,8 @@ new_row(panels, wrap = 140, horizontal_align = "justify") |>
 ```
 
 With `horizontal_align = "justify"`, all lines but the last are spread to the width of the widest line.
+
+`new_column(..., wrap = <mm>)` does the same vertically: a column that is too tall continues in a new column to the right, like newspaper columns.
 
 For plots of similar width, such as small multiples, `new_grid(..., wrap = <mm>)` picks as many grid columns as fit. All rows share the same columns, so the plots line up in both directions.
 

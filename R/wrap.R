@@ -1,51 +1,63 @@
 # Wrapping -------------------------------------------------------------------
 #
-# Rows and grids created with `wrap = <mm>` are resolved after measuring and
-# before solving, so the solver sees an ordinary tree:
+# Rows, columns and grids created with `wrap = <mm>` are resolved after
+# measuring and before solving, so the solver sees an ordinary tree:
 # * a row is broken into lines like text in a word processor: each line
 #   takes as many children as fit (greedy); the row becomes a column of rows.
+# * a column is broken the same way by height into a row of columns.
 # * a grid gets the largest number of columns for which it still fits.
 
-wrap_rows <- function(node, gap = 0) {
+# `gap` is the spacing between plots: c(horizontal, vertical) in mm.
+wrap_rows <- function(node, gap = c(0, 0)) {
   if (!is_container(node)) return(node)
   node$children <- lapply(node$children, wrap_rows, gap = gap)
   if (is.null(node$wrap)) return(node)
-  if (node$type == "grid") return(wrap_grid(node, gap))
-  if (node$type != "row") return(node)
+  switch(node$type,
+    grid = wrap_grid(node, gap[1]),
+    row = wrap_line(node, "x", gap[1]),
+    column = wrap_line(node, "y", gap[2]),
+    node
+  )
+}
 
-  widths <- vapply(node$children, function(child) x_extent(child, gap)$total, numeric(1))
-  lines <- break_lines(widths, node$wrap, gap)
-  too_wide <- widths > node$wrap + 1e-9
-  if (any(too_wide)) {
+# Break a row (axis "x") or column (axis "y") into lines of at most `wrap`
+# mm. A row becomes a column of rows, a column becomes a row of columns.
+wrap_line <- function(node, axis, gap = 0) {
+  sizes <- vapply(node$children, function(child) extent(child, axis, gap)$total, numeric(1))
+  lines <- break_lines(sizes, node$wrap, gap)
+  too_big <- sizes > node$wrap + 1e-9
+  if (any(too_big)) {
+    what <- if (axis == "x") "wider" else "taller"
+    unit <- if (axis == "x") "line" else "column"
     warning(
-      sum(too_wide), " plot(s) are wider than `wrap` (", node$wrap,
-      " mm) and get a line of their own.",
+      sum(too_big), " plot(s) are ", what, " than `wrap` (", node$wrap,
+      " mm) and get a ", unit, " of their own.",
       call. = FALSE
     )
   }
   node$wrap <- NULL
   if (length(lines) == 1) return(node)
 
-  rows <- lapply(seq_along(lines), function(i) {
-    align_x <- node$align$x
+  parts <- lapply(seq_along(lines), function(i) {
+    align <- node$align[[axis]]
     # like justified text: the last line is not spread apart
-    if (align_x == "justify" && i == length(lines)) align_x <- "start"
+    if (align == "justify" && i == length(lines)) align <- "start"
     out <- node
     out$children <- node$children[lines[[i]]]
-    out$align$x <- align_x
+    out$align[[axis]] <- align
     out
   })
   out <- node
-  out$type <- "column"
-  out$children <- rows
-  out$align$x <- switch(node$align$x, justify = "start", node$align$x)
+  out$type <- if (axis == "x") "column" else "row"
+  out$children <- parts
+  out$align[[axis]] <- switch(node$align[[axis]], justify = "start", node$align[[axis]])
   out
 }
 
-# Natural horizontal extent of a node: decoration before, panel span,
+# Natural extent of a node along `axis`: decoration before, panel span,
 # decoration after, and their total (mm).
-x_extent <- function(node, gap = 0) {
-  m <- annotate_axis(node, "x", gap)$m$x
+extent <- function(node, axis, gap = 0) {
+  m <- annotate_axis(node, axis, gap)$m[[axis]]
   list(lead = m$lead, span = m$span, trail = m$trail, total = m$lead + m$span + m$trail)
 }
 
@@ -55,7 +67,7 @@ x_extent <- function(node, gap = 0) {
 wrap_grid <- function(node, gap = 0) {
   cells <- node$children
   n <- length(cells)
-  ext <- lapply(cells, x_extent, gap = gap)
+  ext <- lapply(cells, extent, axis = "x", gap = gap)
   grid_width <- function(ncol) {
     col <- (seq_len(n) - 1) %% ncol
     per_col <- vapply(split(seq_len(n), col), function(idx) {

@@ -8,7 +8,7 @@
 \usage{
 new_row(..., wrap = NULL, horizontal_align = "left", vertical_align = "bottom")
 
-new_column(..., horizontal_align = "left", vertical_align = "bottom")
+new_column(..., wrap = NULL, horizontal_align = "left", vertical_align = NULL)
 
 new_grid(
   ...,
@@ -24,8 +24,8 @@ new_grid(
 tidyplots), grobs or layouts. Lists are spliced, so the output of
 \code{\link[=auto_height]{auto_height()}} can be passed directly.}
 
-\item{wrap}{Maximum width in mm (axis labels, legends and gaps
-included). \code{NULL} (default) never wraps.
+\item{wrap}{Maximum width in mm (maximum height for \code{new_column()}),
+axis labels, legends and gaps included. \code{NULL} (default) never wraps.
 \itemize{
 \item In \code{new_row()}, a row that doesn't fit is broken into several lines,
 like text in a word processor: each line takes as many plots as fit
@@ -36,16 +36,22 @@ widest line. Best for plots of different widths.
 while the grid fits. All rows share the same columns, so this is best
 for plots of similar widths (small multiples). Can't be combined with
 \code{ncol} or \code{nrow}.
+\item In \code{new_column()}, a column that is too tall is broken into several
+columns side by side, like newspaper columns. \code{vertical_align}
+(default \code{"top"} here) applies within every column; with \code{"justify"}
+all columns but the last are spread to the height of the tallest one.
+Tags run down each column before moving to the next.
 }
 
-A plot wider than \code{wrap} gets a line (column) of its own.}
+A plot larger than \code{wrap} gets a line (column) of its own.}
 
 \item{horizontal_align}{Where leftover horizontal space in the new row
 (column, grid) goes: \code{"left"} (default), \code{"right"}, \code{"center"} or
 \code{"justify"} (between its plots).}
 
 \item{vertical_align}{Where leftover vertical space goes: \code{"bottom"}
-(default), \code{"top"}, \code{"center"} or \code{"justify"} (between its plots).}
+(default), \code{"top"}, \code{"center"} or \code{"justify"} (between its plots). For
+\code{new_column()} with \code{wrap}, the default is \code{"top"}.}
 
 \item{ncol, nrow}{Number of grid columns and rows. Cells are filled
 row-wise.}
@@ -122,6 +128,9 @@ new_row(p1, p2, p3, p4, p1, p2, wrap = 100)
 
 # as many grid columns as fit into 100 mm
 new_grid(p1, p2, p3, p4, p1, p2, wrap = 100)
+
+# columns of at most 80 mm height
+new_column(p1, p2, p3, p4, p1, wrap = 80)
 
 # alignment inside a row or column
 new_column(wide, p1, horizontal_align = "center")

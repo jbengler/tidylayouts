@@ -7,7 +7,7 @@
   `"left"` and `"bottom"`) place the plots of that row, column or grid;
   nested rows, columns and grids fill their space and use their own
   alignment. A grid shares row and column tracks.
-* New `layout_plots()` builds a layout from a design string, e.g.
+* New `new_layout()` builds a layout from a design string, e.g.
   `"ABEF\nCDEF\nGGGG"`. Letters place the plots; by default each design line
   becomes a row (`arrange_by = "row"`), alternatively a column or a grid.
   Tags are numbered in reading order, and `tag_group()` works on its inputs.
@@ -17,7 +17,8 @@
   step: each call adds a row below, a column to the right, or a grid below
   everything built so far. They replace `add_right()` and `add_below()`.
   `new_row(..., wrap = <mm>)` breaks a long row into lines, like text in a
-  word processor; `new_grid(..., wrap = <mm>)` picks as many grid columns as
+  word processor; `new_column(..., wrap = <mm>)` breaks a tall column into
+  several columns; `new_grid(..., wrap = <mm>)` picks as many grid columns as
   fit.
 * New `auto_width()` and `auto_height()` let the layout decide a plot's panel
   size; `auto_margins()` keeps the panel size and centers the plot in the

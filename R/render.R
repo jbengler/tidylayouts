@@ -39,7 +39,7 @@ prepare_layout <- function(layout, available = c(NA, NA)) {
   spacing <- c(opts$spacing$horizontal %||% NA, opts$spacing$vertical %||% NA)
   outer <- opts$spacing$outer %||% 0
   node <- measure_leaves(layout, tag_height, zero_margin = !is.na(spacing))
-  node <- wrap_rows(node, gap = if (is.na(spacing[1])) 0 else spacing[1])
+  node <- wrap_rows(node, gap = ifelse(is.na(spacing), 0, spacing))
   sol <- solve_layout(
     node,
     available = available,
@@ -213,7 +213,7 @@ grid.draw.tidylayout <- function(x, recording = TRUE) {
 #' p1 <- dummy(name = "p1", color = "#0072B2")
 #' p2 <- dummy(name = "p2", color = "#D55E00")
 #' file <- tempfile(fileext = ".pdf")
-#' save_layout(row(p1, p2), file)
+#' save_layout(new_row(p1, p2), file)
 #'
 #' @export
 save_layout <- function(layout, filename, width = NULL, height = NULL,

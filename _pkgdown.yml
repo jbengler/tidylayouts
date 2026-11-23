@@ -12,23 +12,20 @@ figures:
 reference:
 - title: Create
   desc: >
-    To create a layout, first assign your plots to variables such as `p1`, `p2`, and `p3`.
-    Then, define a base layout and progressively expand and adjust it.
-    Plots are aligned by their panels.
+    Create a new layout by combining rows, columns and grids, or start from a design string.
 - contents:
   - new_row
-  - layout_plots
+  - new_layout
 - title: Size and margins
   desc: >
-    Panel sizes are fixed with `set_size()`, or decided by the layout with `auto_width()`
-    and `auto_height()`. `auto_margins()` centers a plot in the spare space next to it.
+    Modify sizes a margins of individual plots.
 - contents:
   - auto_width
 - title: Adjust
   desc: >
-    Options for the whole figure.
+    Adjust layout properties.
 - contents:
-  - starts_with("layout_s")
+  - starts_with("layout_")
   - tag_group
 - title: Save
 - contents:

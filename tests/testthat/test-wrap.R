@@ -121,3 +121,59 @@ test_that("wrapping grids solve and render with real plots", {
   file <- withr::local_tempfile(fileext = ".png")
   expect_no_error(save_layout(l, file))
 })
+
+# fake leaves are 2 + 30 + 10 = 42 mm tall
+test_that("a wrapping column becomes a row of columns", {
+  l <- new_column(fake(), fake(), fake(), fake(), fake(), wrap = 100)
+  w <- tidylayouts:::wrap_rows(l)
+  expect_equal(w$type, "row")
+  expect_equal(vapply(w$children, `[[`, "", "type"), c("column", "column", "column"))
+  expect_equal(lengths(lapply(w$children, `[[`, "children")), c(2, 2, 1))
+  expect_null(w$wrap)
+  expect_equal(tidylayouts:::wrap_rows(new_column(fake(), fake(), wrap = 100))$type, "column")
+})
+
+test_that("column wrapping uses the vertical gap and vertical alignment", {
+  l <- new_column(fake(), fake(), wrap = 90)
+  expect_equal(tidylayouts:::wrap_rows(l, gap = c(50, 0))$type, "column")
+  expect_equal(tidylayouts:::wrap_rows(l, gap = c(0, 10))$type, "row")
+  l <- new_column(fake(), fake(), fake(), wrap = 100, vertical_align = "justify")
+  w <- tidylayouts:::wrap_rows(l)
+  expect_equal(vapply(w$children, function(x) x$align$y, ""), c("justify", "start"))
+  expect_equal(w$align$y, "start")
+})
+
+test_that("too tall plots warn and get a column of their own", {
+  l <- new_column(fake(), fake(h = 120), fake(), wrap = 100)
+  expect_warning(w <- tidylayouts:::wrap_rows(l), "taller than `wrap`")
+  expect_equal(lengths(lapply(w$children, `[[`, "children")), c(1, 1, 1))
+})
+
+test_that("wrapped columns sit side by side, tags run down first", {
+  l <- new_column(fake(), fake(), fake(), wrap = 100)
+  sol <- tidylayouts:::solve_layout(tidylayouts:::wrap_rows(l))
+  pl <- sol$placement
+  expect_equal(pl$leaf1$x$start, pl$leaf2$x$start)
+  expect_gt(pl$leaf2$y$start, pl$leaf1$y$start)
+  expect_gt(pl$leaf3$x$start, pl$leaf1$x$start)
+  expect_equal(pl$leaf3$y$start, pl$leaf1$y$start)
+})
+
+test_that("a wrapping column is a closed block and renders", {
+  l <- new_column(dummy(), dummy(), wrap = 50) |> new_row(dummy())
+  expect_equal(l$type, "column")
+  expect_length(l$children, 2)
+  expect_equal(l$children[[1]]$wrap, 50)
+  expect_error(new_column(dummy(), wrap = 0), "positive")
+  p <- lapply(1:5, function(i) dummy(height = 25, name = paste0("p", i)))
+  res <- solve_real(new_column(p, wrap = 80) |> layout_tags("A"))
+  expect_lte(res$sol$size[["y"]], 80 + 1e-6)
+  file <- withr::local_tempfile(fileext = ".png")
+  expect_no_error(save_layout(new_column(p, wrap = 80, vertical_align = "top"), file))
+})
+
+test_that("wrapped columns default to top alignment, explicit values win", {
+  expect_equal(new_column(fake(), wrap = 100)$align$y, "start")
+  expect_equal(new_column(fake())$align$y, "end")
+  expect_equal(new_column(fake(), wrap = 100, vertical_align = "bottom")$align$y, "end")
+})
