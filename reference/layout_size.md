@@ -82,20 +82,20 @@ p1 <- dummy(name = "p1", color = "#0072B2")
 p2 <- dummy(name = "p2", color = "#D55E00", height = 45)
 p3 <- dummy(name = "p3", color = "#009E73", width = NA)
 
-row(p1, p2) |>
-  add_below(p3) |>
+new_row(p1, p2) |>
+  new_row(p3) |>
   layout_tags("A") |>
   layout_title("My figure") |>
   layout_size(width = 120)
 
 
-row(p1, p2) |>
-  add_below(p3) |>
+new_row(p1, p2) |>
+  new_row(p3) |>
   layout_spacing(inner = 2, outer = 5)
 
 
-row(p1, p2) |>
-  add_below(p3) |>
+new_row(p1, p2) |>
+  new_row(p3) |>
   layout_spacing(inner = c(2, 6))
 
 ```

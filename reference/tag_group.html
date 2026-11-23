@@ -62,13 +62,13 @@ one group.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The modified plot or layout if one object was supplied, otherwise
-a list. Layout functions such as <code><a href="row.html">row()</a></code> splice such lists.</p>
+a list. Layout functions such as <code><a href="new_row.html">new_row()</a></code> splice such lists.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The plots of a group are usually arranged together, e.g.
-<code>tag_group(row(p1, p2))</code>. Several plots can also be passed directly:
-<code>row(tag_group(p1, p2), p3)</code>.</p>
+<code>tag_group(new_row(p1, p2))</code>. Several plots can also be passed directly:
+<code>new_row(tag_group(p1, p2), p3)</code>.</p>
     </div>
 
     <div class="section level2">
@@ -78,12 +78,12 @@ a list. Layout functions such as <code><a href="row.html">row()</a></code> splic
 <span class="r-in"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="dummy.html">dummy</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"p3"</span>, color <span class="op">=</span> <span class="st">"#009E73"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># p1 and p2 share tag A, p3 gets B</span></span></span>
-<span class="r-in"><span><span class="fu">tag_group</span><span class="op">(</span><span class="fu"><a href="row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="add_right.html">add_below</a></span><span class="op">(</span><span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span><span class="fu">tag_group</span><span class="op">(</span><span class="fu"><a href="new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tag_group-1.png" alt="" width="1458" height="901"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="row.html">row</a></span><span class="op">(</span><span class="fu">tag_group</span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="new_row.html">new_row</a></span><span class="op">(</span><span class="fu">tag_group</span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="tag_group-2.png" alt="" width="1458" height="901"></span>
 <span class="r-in"><span></span></span>

@@ -16,7 +16,8 @@ spacer(width = NA, height = NA)
 
 - width, height:
 
-  Panel size in mm. `NA` lets the panel stretch.
+  Panel size in mm. `NA` lets the layout decide (like
+  [`auto_width()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)).
 
 - name:
 
@@ -36,8 +37,8 @@ spacer(width = NA, height = NA)
 p1 <- dummy(name = "p1", color = "#0072B2")
 p2 <- dummy(name = "p2", color = "#D55E00")
 
-row(p1, spacer(width = 20), p2)
+new_row(p1, spacer(width = 20), p2)
 
-row(p1, spacer(), p2) |> layout_size(width = 120)
+new_row(p1, spacer(), p2) |> layout_size(width = 120)
 
 ```

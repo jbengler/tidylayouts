@@ -9,33 +9,48 @@ dimensions, such as those created with `tidyplots`, as well as plain
 `ggplot2` plots. Plots are aligned by their **panels**, not by their
 outer boxes, so axes and tags line up across the whole figure.
 
+## Installation
+
+You can install the development version from
+[GitHub](https://github.com/) with:
+
+``` r
+
+# install.packages("pak")
+pak::pak("jbengler/tidylayouts")
+```
+
 ## Usage
 
-Start with a row of plots and extend it step by step.
-[`add_right()`](https://jbengler.github.io/tidylayouts/reference/add_right.md)
-and
-[`add_below()`](https://jbengler.github.io/tidylayouts/reference/add_right.md)
-append to a row or column, or wrap the layout in a new one.
+Build a figure step by step:
+[`new_row()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+adds a row of plots below everything so far,
+[`new_column()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+adds a column to the right.
 
 ``` r
 
 library(tidylayouts)
 
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(stretch_y(p5, p6)) |>
-  add_below(stretch_x(p7))
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(auto_height(p5)) |>
+  new_column(auto_height(p6)) |>
+  new_row(auto_width(p7))
 ```
 
 ![](reference/figures/README-usage-dummies-1.png)
 
 All plots above have a fixed panel size of 30 × 30 mm.
-[`stretch_y()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
+[`auto_height()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
 and
-[`stretch_x()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-let a panel fill the space it gets from its neighbours: `p5` and `p6`
-span the height of the block on the left, `p7` spans the width of
-everything above.
+[`auto_width()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+let the layout decide the panel size: the panel fills the space it gets
+from its neighbours: `p5` and `p6` span the height of the block on the
+left, `p7` spans the width of everything above.
+
+[`new_grid()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+adds a block of plots that share rows and columns.
 
 ## Real plots
 
@@ -93,10 +108,11 @@ the top of the row.
 
 ``` r
 
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(p5, p6) |>
-  add_below(p7) |>
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(p5) |>
+  new_column(p6) |>
+  new_row(p7) |>
   layout_tags("A")
 ```
 
@@ -107,10 +123,11 @@ space.
 
 ``` r
 
-row(p1, p2) |>
-  add_below(row(p3, p4)) |>
-  add_right(stretch_y(p5, p6)) |>
-  add_below(stretch_x(p7)) |>
+new_row(p1, p2) |>
+  new_row(p3, p4) |>
+  new_column(auto_height(p5)) |>
+  new_column(auto_height(p6)) |>
+  new_row(auto_width(p7)) |>
   layout_tags("A")
 ```
 
@@ -118,23 +135,23 @@ row(p1, p2) |>
 
 ## Design strings
 
-[`layout_plots()`](https://jbengler.github.io/tidylayouts/reference/layout_plots.md)
+[`new_layout()`](https://jbengler.github.io/tidylayouts/reference/new_layout.md)
 describes a whole figure in one call. Each letter in the design is a
 plot; plots are assigned in alphabetical order of the letters, and `#`
 marks an empty cell.
 
 ``` r
 
-layout_plots(
+new_layout(
   tag_group(p1, p2), p3, p4, p5, p6, p7,
   design = "
     ABEF
     CDEF
     GGGG
   ",
-  stretch_x = "G",
-  stretch_y = "EF",
-  center_x = "D",
+  auto_width = "G",
+  auto_height = "EF",
+  auto_margins_x = "D",
   tags = "A"
 )
 ```
@@ -143,16 +160,20 @@ layout_plots(
 
 By default, each line of the design becomes a row, so the figure above
 has the same structure as
-`row(p1, p2) |> add_below(row(p3, p4)) |> add_right(p5, p6) |> add_below(p7)`.
+`new_row(p1, p2) |> new_row(p3, p4) |> new_column(p5) |> new_column(p6) |> new_row(p7)`.
 With `arrange_by = "column"`, each design column becomes a column
 instead, and with `arrange_by = "grid"` plots in the same row and column
 of the design share their lines.
 
 The design shows the arrangement, not the size: plots keep their panel
-sizes, also when they span several cells. `stretch_x`, `stretch_y`,
-`center_x` and `center_y` change that for the listed plots, just like
-the functions of the same name. Tags are numbered in reading order, as
-with
+sizes, also when they span several cells. `auto_width`, `auto_height`,
+`auto_margins_x` and `auto_margins_y` change that for the listed plots,
+like the functions
+[`auto_width()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md),
+[`auto_height()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+and
+[`auto_margins()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md).
+Tags are numbered in reading order, as with
 [`layout_tags()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md);
 here
 [`tag_group()`](https://jbengler.github.io/tidylayouts/reference/tag_group.md)
@@ -166,28 +187,28 @@ defaults are `"left"` and `"bottom"`, where the axis lines are.
 
 ``` r
 
-row(p1, p2)
+new_row(p1, p2)
 ```
 
 ![](reference/figures/README-align-1.png)
 
 ``` r
 
-row(p1, p2, vertical_align = "top")
+new_row(p1, p2, vertical_align = "top")
 ```
 
 ![](reference/figures/README-align-2.png)
 
 ``` r
 
-row(p1, p2, vertical_align = "center")
+new_row(p1, p2, vertical_align = "center")
 ```
 
 ![](reference/figures/README-align-3.png)
 
 ``` r
 
-column(p1, p3, horizontal_align = "center")
+new_column(p1, p3, horizontal_align = "center")
 ```
 
 ![](reference/figures/README-align-column-1.png)
@@ -198,23 +219,22 @@ the extra space between them:
 
 ``` r
 
-row(p3, p3) |>
-  add_below(row(p1, p1, horizontal_align = "justify"))
+new_row(p3, p3) |>
+  new_row(p1, p1, horizontal_align = "justify")
 ```
 
 ![](reference/figures/README-align-nested-1.png)
 
 To center a single plot within the spare space next to it, use
-[`center_x()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-or
-[`center_y()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md).
+[`auto_margins()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md).
 The panel keeps its size, the extra space goes to both sides, and the
-tag stays at the edge of the space.
+tag stays at the edge of the space. Use `y = FALSE` to center only
+horizontally, so the plot keeps the row’s shared bottom edge.
 
 ``` r
 
-row(p3, p3) |>
-  add_below(row(p1, center_x(p1))) |>
+new_row(p3, p3) |>
+  new_row(p1, auto_margins(p1, y = FALSE)) |>
   layout_tags("A")
 ```
 
@@ -222,31 +242,67 @@ row(p3, p3) |>
 
 ## Rows of plots vs. grids
 
-`column(row(...), row(...))` lays out each row independently.
-[`grid()`](https://jbengler.github.io/tidylayouts/reference/row.md)
+[`new_row()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+lays out each row independently.
+[`new_grid()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
 shares row and column tracks, so plots in the same grid column line up
 exactly.
 
 ``` r
 
-column(row(narrow, narrow), row(wide, wide))
+new_row(narrow, narrow) |> new_row(wide, wide)
 ```
 
 ![](reference/figures/README-grid-1.png)
 
 ``` r
 
-grid(narrow, narrow, wide, wide, ncol = 2)
+new_grid(narrow, narrow, wide, wide, ncol = 2)
 ```
 
 ![](reference/figures/README-grid-2.png)
+
+## Wrapping rows
+
+`new_row(..., wrap = <mm>)` breaks a long row into lines, like text in a
+word processor: each line takes as many plots as fit, axis labels and
+gaps included. This is handy when plots have different widths.
+
+``` r
+
+new_row(panels, wrap = 140, horizontal_align = "justify") |>
+  layout_tags("A")
+```
+
+![](reference/figures/README-wrap-1.png)
+
+With `horizontal_align = "justify"`, all lines but the last are spread
+to the width of the widest line.
+
+`new_column(..., wrap = <mm>)` does the same vertically: a column that
+is too tall continues in a new column to the right, like newspaper
+columns.
+
+For plots of similar width, such as small multiples,
+`new_grid(..., wrap = <mm>)` picks as many grid columns as fit. All rows
+share the same columns, so the plots line up in both directions.
+
+``` r
+
+small <- lapply(1:7, function(i) dummy(width = 30, height = 20, name = paste0("p", i), color = cols[i]))
+
+new_grid(small, wrap = 120) |>
+  layout_tags("A")
+```
+
+![](reference/figures/README-wrap-grid-1.png)
 
 ## Layout options
 
 ``` r
 
-row(narrow, wide) |>
-  add_below(stretch_x(narrow)) |>
+new_row(narrow, wide) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("a") |>
   layout_title("Figure 1") |>
   layout_size(width = 120)
@@ -261,8 +317,8 @@ after the group.
 
 ``` r
 
-tag_group(row(narrow, wide)) |>
-  add_below(stretch_x(narrow)) |>
+tag_group(new_row(narrow, wide)) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("A")
 ```
 
@@ -277,8 +333,8 @@ figure.
 
 ``` r
 
-row(narrow, wide) |>
-  add_below(stretch_x(narrow)) |>
+new_row(narrow, wide) |>
+  new_row(auto_width(narrow)) |>
   layout_tags("a") |>
   layout_spacing(inner = c(2, 6), outer = 5)
 ```
@@ -306,14 +362,14 @@ size it absorbs leftover space.
 
 ``` r
 
-row(p1, spacer(width = 20), p1)
+new_row(p1, spacer(width = 20), p1)
 ```
 
 ![](reference/figures/README-placeholders-1.png)
 
 ``` r
 
-row(p1, spacer(), p1) |> layout_size(width = 150)
+new_row(p1, spacer(), p1) |> layout_size(width = 150)
 ```
 
 ![](reference/figures/README-placeholders-2.png)
@@ -322,44 +378,30 @@ row(p1, spacer(), p1) |> layout_size(width = 150)
 
 ## Create
 
-To create a layout, first assign your plots to variables such as `p1`,
-`p2`, and `p3`. Then, define a base layout and progressively expand and
-adjust it. Plots are aligned by their panels.
+Create a new layout by combining rows, columns and grids, or start from
+a design string.
 
-- [`row()`](https://jbengler.github.io/tidylayouts/reference/row.md)
-  [`column()`](https://jbengler.github.io/tidylayouts/reference/row.md)
-  [`grid()`](https://jbengler.github.io/tidylayouts/reference/row.md) :
-  Arrange plots in rows, columns and grids
-- [`layout_plots()`](https://jbengler.github.io/tidylayouts/reference/layout_plots.md)
+- [`new_row()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+  [`new_column()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+  [`new_grid()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
+  : Build a layout row by row
+- [`new_layout()`](https://jbengler.github.io/tidylayouts/reference/new_layout.md)
   : Lay out plots from a design string
 
-## Extend
+## Size and margins
 
-Add plots to the right of or below a layout.
+Modify sizes a margins of individual plots.
 
-- [`add_right()`](https://jbengler.github.io/tidylayouts/reference/add_right.md)
-  [`add_below()`](https://jbengler.github.io/tidylayouts/reference/add_right.md)
-  : Extend a layout
-
-## Stretch and center
-
-Panel sizes are set on the plot
-([`tidyplots::adjust_size()`](https://jbengler.github.io/tidyplots/reference/adjust_size.html)
-or `theme(panel.widths)`). A plot can take the spare space next to it,
-either stretching its panel or staying centered.
-
-- [`stretch_x()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-  [`stretch_y()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-  [`center_x()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-  [`center_y()`](https://jbengler.github.io/tidylayouts/reference/stretch_x.md)
-  : Stretch or center plots in the available space
+- [`auto_width()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+  [`auto_height()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+  [`auto_margins()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+  [`set_size()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
+  : Panel sizes and margins in a layout
 
 ## Adjust
 
-Options for the whole figure.
+Adjust layout properties.
 
-- [`layout_plots()`](https://jbengler.github.io/tidylayouts/reference/layout_plots.md)
-  : Lay out plots from a design string
 - [`layout_size()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md)
   [`layout_spacing()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md)
   [`layout_tags()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md)

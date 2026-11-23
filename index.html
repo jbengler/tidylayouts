@@ -61,36 +61,40 @@
 <!-- badges: end -->
 <p>The goal of <code>tidylayouts</code> is to streamline the creation of multi-plot layouts for scientific papers. It allows to gradually expand and adjust layouts using a consistent and intuitive syntax.</p>
 <p><code>tidylayouts</code> is built around the pipe and supports plots with absolute dimensions, such as those created with <code>tidyplots</code>, as well as plain <code>ggplot2</code> plots. Plots are aligned by their <strong>panels</strong>, not by their outer boxes, so axes and tags line up across the whole figure.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <!--
-&#10;## Installation
 &#10;You can install the released version of tidylayouts from [CRAN](https://cran.r-project.org/) with:
 ``` r
 install.packages("tidylayouts")
 ```
-&#10;And the development version from [GitHub](https://github.com/) with:
-``` r
-# install.packages("pak")
-pak::pak("jbengler/tidylayouts")
-```
 &#10;-->
+<p>You can install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"jbengler/tidylayouts"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>Start with a row of plots and extend it step by step. <code><a href="reference/add_right.html">add_right()</a></code> and <code><a href="reference/add_right.html">add_below()</a></code> append to a row or column, or wrap the layout in a new one.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<p>Build a figure step by step: <code><a href="reference/new_row.html">new_row()</a></code> adds a row of plots below everything so far, <code><a href="reference/new_row.html">new_column()</a></code> adds a column to the right.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jbengler/tidylayouts" class="external-link">tidylayouts</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_right</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_y</a></span><span class="op">(</span><span class="va">p5</span>, <span class="va">p6</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_x</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_height</a></span><span class="op">(</span><span class="va">p5</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_height</a></span><span class="op">(</span><span class="va">p6</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_width</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-usage-dummies-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>All plots above have a fixed panel size of 30 × 30 mm. <code><a href="reference/stretch_x.html">stretch_y()</a></code> and <code><a href="reference/stretch_x.html">stretch_x()</a></code> let a panel fill the space it gets from its neighbours: <code>p5</code> and <code>p6</code> span the height of the block on the left, <code>p7</code> spans the width of everything above.</p>
+<p>All plots above have a fixed panel size of 30 × 30 mm. <code><a href="reference/auto_width.html">auto_height()</a></code> and <code><a href="reference/auto_width.html">auto_width()</a></code> let the layout decide the panel size: the panel fills the space it gets from its neighbours: <code>p5</code> and <code>p6</code> span the height of the block on the left, <code>p7</code> spans the width of everything above.</p>
+<p><code><a href="reference/new_row.html">new_grid()</a></code> adds a block of plots that share rows and columns.</p>
 </div>
 <div class="section level2">
 <h2 id="real-plots">Real plots<a class="anchor" aria-label="anchor" href="#real-plots"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">tidyplots_options</span><span class="op">(</span></span>
 <span>  width <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  height <span class="op">=</span> <span class="fl">25</span>,</span>
@@ -136,107 +140,127 @@ pak::pak("jbengler/tidylayouts")
 <span></span>
 <span><span class="fu">tidyplots_options</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>By default, plots keep their size. In a row, panels are aligned at the bottom so that the x axes line up. The panel tags are still aligned at the top of the row.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_right</a></span><span class="op">(</span><span class="va">p5</span>, <span class="va">p6</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="va">p5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="va">p6</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-real-fixed-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>Freeing the heatmaps and the violin plots makes them fill the available space.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_right</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_y</a></span><span class="op">(</span><span class="va">p5</span>, <span class="va">p6</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_x</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p4</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_height</a></span><span class="op">(</span><span class="va">p5</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_height</a></span><span class="op">(</span><span class="va">p6</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_width</a></span><span class="op">(</span><span class="va">p7</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-real-freed-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="design-strings">Design strings<a class="anchor" aria-label="anchor" href="#design-strings"></a>
 </h2>
-<p><code><a href="reference/layout_plots.html">layout_plots()</a></code> describes a whole figure in one call. Each letter in the design is a plot; plots are assigned in alphabetical order of the letters, and <code>#</code> marks an empty cell.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/layout_plots.html">layout_plots</a></span><span class="op">(</span></span>
+<p><code><a href="reference/new_layout.html">new_layout()</a></code> describes a whole figure in one call. Each letter in the design is a plot; plots are assigned in alphabetical order of the letters, and <code>#</code> marks an empty cell.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_layout.html">new_layout</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="reference/tag_group.html">tag_group</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span>, <span class="va">p3</span>, <span class="va">p4</span>, <span class="va">p5</span>, <span class="va">p6</span>, <span class="va">p7</span>,</span>
 <span>  design <span class="op">=</span> <span class="st">"</span></span>
 <span><span class="st">    ABEF</span></span>
 <span><span class="st">    CDEF</span></span>
 <span><span class="st">    GGGG</span></span>
 <span><span class="st">  "</span>,</span>
-<span>  stretch_x <span class="op">=</span> <span class="st">"G"</span>,</span>
-<span>  stretch_y <span class="op">=</span> <span class="st">"EF"</span>,</span>
-<span>  center_x <span class="op">=</span> <span class="st">"D"</span>,</span>
+<span>  auto_width <span class="op">=</span> <span class="st">"G"</span>,</span>
+<span>  auto_height <span class="op">=</span> <span class="st">"EF"</span>,</span>
+<span>  auto_margins_x <span class="op">=</span> <span class="st">"D"</span>,</span>
 <span>  tags <span class="op">=</span> <span class="st">"A"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-design-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>By default, each line of the design becomes a row, so the figure above has the same structure as <code>row(p1, p2) |&gt; add_below(row(p3, p4)) |&gt; add_right(p5, p6) |&gt; add_below(p7)</code>. With <code>arrange_by = "column"</code>, each design column becomes a column instead, and with <code>arrange_by = "grid"</code> plots in the same row and column of the design share their lines.</p>
-<p>The design shows the arrangement, not the size: plots keep their panel sizes, also when they span several cells. <code>stretch_x</code>, <code>stretch_y</code>, <code>center_x</code> and <code>center_y</code> change that for the listed plots, just like the functions of the same name. Tags are numbered in reading order, as with <code><a href="reference/layout_size.html">layout_tags()</a></code>; here <code><a href="reference/tag_group.html">tag_group()</a></code> lets the first two plots share tag A.</p>
+<p>By default, each line of the design becomes a row, so the figure above has the same structure as <code>new_row(p1, p2) |&gt; new_row(p3, p4) |&gt; new_column(p5) |&gt; new_column(p6) |&gt; new_row(p7)</code>. With <code>arrange_by = "column"</code>, each design column becomes a column instead, and with <code>arrange_by = "grid"</code> plots in the same row and column of the design share their lines.</p>
+<p>The design shows the arrangement, not the size: plots keep their panel sizes, also when they span several cells. <code>auto_width</code>, <code>auto_height</code>, <code>auto_margins_x</code> and <code>auto_margins_y</code> change that for the listed plots, like the functions <code><a href="reference/auto_width.html">auto_width()</a></code>, <code><a href="reference/auto_width.html">auto_height()</a></code> and <code><a href="reference/auto_width.html">auto_margins()</a></code>. Tags are numbered in reading order, as with <code><a href="reference/layout_size.html">layout_tags()</a></code>; here <code><a href="reference/tag_group.html">tag_group()</a></code> lets the first two plots share tag A.</p>
 </div>
 <div class="section level2">
 <h2 id="alignment">Alignment<a class="anchor" aria-label="anchor" href="#alignment"></a>
 </h2>
 <p>Plots with a fixed size often leave some space in their row or column. <code>horizontal_align</code> and <code>vertical_align</code> decide where it goes. The defaults are <code>"left"</code> and <code>"bottom"</code>, where the axis lines are.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-align-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, vertical_align <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-align-2.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-align-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, vertical_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-align-3.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, vertical_align <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-align-2.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">column</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p3</span>, horizontal_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, vertical_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-align-3.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_column</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p3</span>, horizontal_align <span class="op">=</span> <span class="st">"center"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-align-column-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>Alignment applies to what is directly inside a row or column. A nested row fills the width it is given and arranges its own plots, e.g. with the extra space between them:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p1</span>, horizontal_align <span class="op">=</span> <span class="st">"justify"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-align-nested-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
-<p>To center a single plot within the spare space next to it, use <code><a href="reference/stretch_x.html">center_x()</a></code> or <code><a href="reference/stretch_x.html">center_y()</a></code>. The panel keeps its size, the extra space goes to both sides, and the tag stays at the edge of the space.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/stretch_x.html">center_x</a></span><span class="op">(</span><span class="va">p1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p1</span>, horizontal_align <span class="op">=</span> <span class="st">"justify"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-align-nested-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p>To center a single plot within the spare space next to it, use <code><a href="reference/auto_width.html">auto_margins()</a></code>. The panel keeps its size, the extra space goes to both sides, and the tag stays at the edge of the space. Use <code>y = FALSE</code> to center only horizontally, so the plot keeps the row’s shared bottom edge.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p3</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/auto_width.html">auto_margins</a></span><span class="op">(</span><span class="va">p1</span>, y <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-center-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="rows-of-plots-vs-grids">Rows of plots vs. grids<a class="anchor" aria-label="anchor" href="#rows-of-plots-vs-grids"></a>
 </h2>
-<p><code>column(row(...), row(...))</code> lays out each row independently. <code><a href="reference/row.html">grid()</a></code> shares row and column tracks, so plots in the same grid column line up exactly.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">column</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">narrow</span><span class="op">)</span>, <span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">wide</span>, <span class="va">wide</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-grid-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p><code><a href="reference/new_row.html">new_row()</a></code> lays out each row independently. <code><a href="reference/new_row.html">new_grid()</a></code> shares row and column tracks, so plots in the same grid column line up exactly.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">grid</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">narrow</span>, <span class="va">wide</span>, <span class="va">wide</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">narrow</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">wide</span>, <span class="va">wide</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-grid-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_grid</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">narrow</span>, <span class="va">wide</span>, <span class="va">wide</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-grid-2.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level2">
+<h2 id="wrapping-rows">Wrapping rows<a class="anchor" aria-label="anchor" href="#wrapping-rows"></a>
+</h2>
+<p><code>new_row(..., wrap = &lt;mm&gt;)</code> breaks a long row into lines, like text in a word processor: each line takes as many plots as fit, axis labels and gaps included. This is handy when plots have different widths.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">panels</span>, wrap <span class="op">=</span> <span class="fl">140</span>, horizontal_align <span class="op">=</span> <span class="st">"justify"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-wrap-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
+<p>With <code>horizontal_align = "justify"</code>, all lines but the last are spread to the width of the widest line.</p>
+<p><code>new_column(..., wrap = &lt;mm&gt;)</code> does the same vertically: a column that is too tall continues in a new column to the right, like newspaper columns.</p>
+<p>For plots of similar width, such as small multiples, <code>new_grid(..., wrap = &lt;mm&gt;)</code> picks as many grid columns as fit. All rows share the same columns, so the plots line up in both directions.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">small</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">7</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="reference/dummy.html">dummy</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">30</span>, height <span class="op">=</span> <span class="fl">20</span>, name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"p"</span>, <span class="va">i</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">cols</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/new_row.html">new_grid</a></span><span class="op">(</span><span class="va">small</span>, wrap <span class="op">=</span> <span class="fl">120</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-wrap-grid-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="layout-options">Layout options<a class="anchor" aria-label="anchor" href="#layout-options"></a>
 </h2>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_x</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_width</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_title</a></span><span class="op">(</span><span class="st">"Figure 1"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_size</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">120</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-options-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>To let several plots share one tag, wrap them in <code><a href="reference/tag_group.html">tag_group()</a></code>. Only the first plot of the group gets a tag, and the sequence continues after the group.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/tag_group.html">tag_group</a></span><span class="op">(</span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_x</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/tag_group.html">tag_group</a></span><span class="op">(</span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_width</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-tag-group-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>By default, the gaps between plots come from each plot’s own margins. <code><a href="reference/layout_size.html">layout_spacing()</a></code> replaces them with fixed gaps in mm, so spacing stays even when plots use different themes. <code>inner</code> takes one value for both directions or <code>c(horizontal, vertical)</code>; <code>outer</code> adds a margin around the whole figure.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/add_right.html">add_below</a></span><span class="op">(</span><span class="fu"><a href="reference/stretch_x.html">stretch_x</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">narrow</span>, <span class="va">wide</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="fu"><a href="reference/auto_width.html">auto_width</a></span><span class="op">(</span><span class="va">narrow</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_tags</a></span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/layout_size.html">layout_spacing</a></span><span class="op">(</span>inner <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">6</span><span class="op">)</span>, outer <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-spacing-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 <p>Save a figure at its exact physical size with <code><a href="reference/save_layout.html">save_layout()</a></code>. If all panels have a fixed size, the figure size is computed from the layout.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/save_layout.html">save_layout</a></span><span class="op">(</span><span class="va">my_layout</span>, <span class="st">"figure1.pdf"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/save_layout.html">save_layout</a></span><span class="op">(</span><span class="va">my_layout</span>, <span class="st">"figure1.pdf"</span>, width <span class="op">=</span> <span class="fl">183</span><span class="op">)</span>  <span class="co"># Nature double column</span></span></code></pre></div>
 </div>
@@ -244,11 +268,11 @@ pak::pak("jbengler/tidylayouts")
 <h2 id="placeholders">Placeholders<a class="anchor" aria-label="anchor" href="#placeholders"></a>
 </h2>
 <p><code><a href="reference/dummy.html">dummy()</a></code> creates placeholder plots for sketching layouts. <code><a href="reference/dummy.html">spacer()</a></code> creates an empty slot: with a size in mm it is a fixed gap, without a size it absorbs leftover space.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/dummy.html">spacer</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, <span class="va">p1</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/dummy.html">spacer</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>, <span class="va">p1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-placeholders-1.png" alt="" width="100%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/row.html">row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/dummy.html">spacer</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">p1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/layout_size.html">layout_size</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/new_row.html">new_row</a></span><span class="op">(</span><span class="va">p1</span>, <span class="fu"><a href="reference/dummy.html">spacer</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">p1</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/layout_size.html">layout_size</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">150</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-placeholders-2.png" alt="" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>

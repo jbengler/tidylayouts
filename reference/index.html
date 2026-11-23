@@ -33,7 +33,7 @@
     <div class="section level2">
       <h2 id="create">Create<a class="anchor" aria-label="anchor" href="#create"></a></h2>
 
-      <div class="section-desc"><p>To create a layout, first assign your plots to variables such as <code>p1</code>, <code>p2</code>, and <code>p3</code>. Then, define a base layout and progressively expand and adjust it. Plots are aligned by their panels.</p></div>
+      <div class="section-desc"><p>Create a new layout by combining rows, columns and grids, or start from a design string.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -42,37 +42,21 @@
 
       <dl><dt>
 
-          <code><a href="row.html">row()</a></code> <code><a href="row.html">column()</a></code> <code><a href="row.html">grid()</a></code>
+          <code><a href="new_row.html">new_row()</a></code> <code><a href="new_row.html">new_column()</a></code> <code><a href="new_row.html">new_grid()</a></code>
 
         </dt>
-        <dd>Arrange plots in rows, columns and grids</dd>
+        <dd>Build a layout row by row</dd>
 
         <dt>
 
-          <code><a href="layout_plots.html">layout_plots()</a></code>
+          <code><a href="new_layout.html">new_layout()</a></code>
 
         </dt>
         <dd>Lay out plots from a design string</dd>
       </dl></div><div class="section level2">
-      <h2 id="extend">Extend<a class="anchor" aria-label="anchor" href="#extend"></a></h2>
+      <h2 id="size-and-margins">Size and margins<a class="anchor" aria-label="anchor" href="#size-and-margins"></a></h2>
 
-      <div class="section-desc"><p>Add plots to the right of or below a layout.</p></div>
-
-      <dl></dl></div><div class="section level2">
-
-
-
-
-      <dl><dt>
-
-          <code><a href="add_right.html">add_right()</a></code> <code><a href="add_right.html">add_below()</a></code>
-
-        </dt>
-        <dd>Extend a layout</dd>
-      </dl></div><div class="section level2">
-      <h2 id="stretch-and-center">Stretch and center<a class="anchor" aria-label="anchor" href="#stretch-and-center"></a></h2>
-
-      <div class="section-desc"><p>Panel sizes are set on the plot (<code><a href="https://jbengler.github.io/tidyplots/reference/adjust_size.html" class="external-link">tidyplots::adjust_size()</a></code> or <code>theme(panel.widths)</code>). A plot can take the spare space next to it, either stretching its panel or staying centered.</p></div>
+      <div class="section-desc"><p>Modify sizes a margins of individual plots.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -81,14 +65,14 @@
 
       <dl><dt>
 
-          <code><a href="stretch_x.html">stretch_x()</a></code> <code><a href="stretch_x.html">stretch_y()</a></code> <code><a href="stretch_x.html">center_x()</a></code> <code><a href="stretch_x.html">center_y()</a></code>
+          <code><a href="auto_width.html">auto_width()</a></code> <code><a href="auto_width.html">auto_height()</a></code> <code><a href="auto_width.html">auto_margins()</a></code> <code><a href="auto_width.html">set_size()</a></code>
 
         </dt>
-        <dd>Stretch or center plots in the available space</dd>
+        <dd>Panel sizes and margins in a layout</dd>
       </dl></div><div class="section level2">
       <h2 id="adjust">Adjust<a class="anchor" aria-label="anchor" href="#adjust"></a></h2>
 
-      <div class="section-desc"><p>Options for the whole figure.</p></div>
+      <div class="section-desc"><p>Adjust layout properties.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -96,13 +80,6 @@
 
 
       <dl><dt>
-
-          <code><a href="layout_plots.html">layout_plots()</a></code>
-
-        </dt>
-        <dd>Lay out plots from a design string</dd>
-
-        <dt>
 
           <code><a href="layout_size.html">layout_size()</a></code> <code><a href="layout_size.html">layout_spacing()</a></code> <code><a href="layout_size.html">layout_tags()</a></code> <code><a href="layout_size.html">layout_title()</a></code>
 

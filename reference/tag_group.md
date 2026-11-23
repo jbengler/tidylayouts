@@ -22,14 +22,14 @@ tag_group(...)
 
 The modified plot or layout if one object was supplied, otherwise a
 list. Layout functions such as
-[`row()`](https://jbengler.github.io/tidylayouts/reference/row.md)
+[`new_row()`](https://jbengler.github.io/tidylayouts/reference/new_row.md)
 splice such lists.
 
 ## Details
 
 The plots of a group are usually arranged together, e.g.
-`tag_group(row(p1, p2))`. Several plots can also be passed directly:
-`row(tag_group(p1, p2), p3)`.
+`tag_group(new_row(p1, p2))`. Several plots can also be passed directly:
+`new_row(tag_group(p1, p2), p3)`.
 
 ## Examples
 
@@ -39,12 +39,12 @@ p2 <- dummy(name = "p2", color = "#D55E00")
 p3 <- dummy(name = "p3", color = "#009E73")
 
 # p1 and p2 share tag A, p3 gets B
-tag_group(row(p1, p2)) |>
-  add_below(p3) |>
+tag_group(new_row(p1, p2)) |>
+  new_row(p3) |>
   layout_tags("A")
 
 
-row(tag_group(p1, p2), p3) |>
+new_row(tag_group(p1, p2), p3) |>
   layout_tags("A")
 
 ```
