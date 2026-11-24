@@ -21,7 +21,8 @@ new_grid(
 }
 \arguments{
 \item{...}{A layout (optional, first) followed by ggplots (including
-tidyplots), grobs or layouts. Lists are spliced, so the output of
+tidyplots), grobs, layouts, or other objects that render themselves to
+a gtable (see \code{\link[=as_layout_gtable]{as_layout_gtable()}}), such as tidymontage montages. Lists are spliced, so the output of
 \code{\link[=auto_height]{auto_height()}} can be passed directly.}
 
 \item{wrap}{Maximum width in mm (maximum height for \code{new_column()}),

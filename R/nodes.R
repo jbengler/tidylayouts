@@ -2,7 +2,8 @@
 #
 # A layout is a tree of nodes of class "tidylayout". Container nodes
 # ("row", "column", "grid") hold children; leaf nodes ("plot", "grob",
-# "spacer") hold content. Nothing is drawn until the layout is printed.
+# "spacer") hold content. A "plot" leaf holds either a ggplot (`plot`) or
+# another object with an `as_layout_gtable()` method (`object`). Nothing is drawn until the layout is printed.
 
 new_node <- function(type, children = list(), ...) {
   structure(list(type = type, children = children, ...), class = "tidylayout")
@@ -21,9 +22,12 @@ as_node <- function(x, call = parent.frame()) {
                     no_tag = x$tidylayouts$no_tag))
   }
   if (inherits(x, "grob")) return(new_node("grob", grob = x))
+  # other objects that render themselves to a gtable (see `as_layout_gtable()`)
+  if (has_layout_gtable(x)) return(new_node("plot", plot = NULL, object = x))
   stop(
     "Can't use an object of class <", class(x)[1], "> in a layout. ",
-    "Supply ggplots, grobs or layouts.",
+    "Supply ggplots, grobs, layouts, or objects with an ",
+    "`as_layout_gtable()` method.",
     call. = FALSE
   )
 }
@@ -140,7 +144,8 @@ make_grid <- function(items, ncol = NULL, nrow = NULL,
 #' between `p3` and `p4`.
 #'
 #' @param ... A layout (optional, first) followed by ggplots (including
-#'   tidyplots), grobs or layouts. Lists are spliced, so the output of
+#'   tidyplots), grobs, layouts, or other objects that render themselves to
+#'   a gtable (see [as_layout_gtable()]), such as tidymontage montages. Lists are spliced, so the output of
 #'   [auto_height()] can be passed directly.
 #' @param horizontal_align Where leftover horizontal space in the new row
 #'   (column, grid) goes: `"left"` (default), `"right"`, `"center"` or

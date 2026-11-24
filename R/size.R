@@ -19,7 +19,9 @@
 #'
 #' If several plots in a row or column take spare space, they share it
 #' equally. These functions work for tidyplots and plain ggplots. Layouts are
-#' modified recursively, i.e. all plots inside them are changed.
+#' modified recursively, i.e. all plots inside them are changed. Other
+#' objects in a layout (see [as_layout_gtable()]) keep the size they render
+#' at: `auto_margins()` works for them, the others leave them unchanged.
 #'
 #' @param ... ggplots, layouts, or lists of them.
 #' @param x,y Center horizontally / vertically.
@@ -116,8 +118,10 @@ place_in_space <- function(items, axis, mode) {
 resize <- function(x, width, height) {
   if (is_ggplot(x)) return(set_plot_size(x, width, height))
   if (is_tidylayout(x)) {
+    # Only ggplots can be resized; other objects (see `as_layout_gtable()`)
+    # keep the size they render at.
     return(map_leaves(x, function(leaf) {
-      if (leaf$type == "plot") {
+      if (leaf$type == "plot" && !is.null(leaf$plot)) {
         leaf$plot <- set_plot_size(leaf$plot, width, height)
         leaf$gtable <- NULL
       }
@@ -140,10 +144,11 @@ set_center <- function(x, axis, value) {
     x$tidylayouts$center[[axis]] <- value
     return(x)
   }
+  if (!is_tidylayout(x) && has_layout_gtable(x)) x <- as_node(x)
   if (is_tidylayout(x)) {
     return(map_leaves(x, function(leaf) {
       if (leaf$type == "plot") {
-        leaf$plot <- set_center(leaf$plot, axis, value)
+        if (!is.null(leaf$plot)) leaf$plot <- set_center(leaf$plot, axis, value)
         leaf$center[[axis]] <- value
       }
       leaf

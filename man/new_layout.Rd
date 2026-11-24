@@ -16,7 +16,8 @@ new_layout(
 )
 }
 \arguments{
-\item{...}{ggplots, grobs or layouts, in the order described above. Lists
+\item{...}{ggplots, grobs, layouts or other objects with an
+\code{\link[=as_layout_gtable]{as_layout_gtable()}} method, in the order described above. Lists
 are spliced.}
 
 \item{design}{A string with one line per row of cells.}

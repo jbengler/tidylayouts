@@ -36,7 +36,7 @@ measure_leaf <- function(leaf, tag_height = 0, zero_margin = c(FALSE, FALSE)) {
     leaf$tag_height <- tag_height
     return(leaf)
   }
-  gt <- leaf$gtable %||% ggplot2::ggplotGrob(leaf$plot)
+  gt <- leaf$gtable %||% leaf_gtable(leaf)
   panels <- gt$layout[grepl("^panel", gt$layout$name), , drop = FALSE]
   leaf$gtable <- gt
   leaf$dims <- list(
@@ -49,7 +49,8 @@ measure_leaf <- function(leaf, tag_height = 0, zero_margin = c(FALSE, FALSE)) {
   leaf
 }
 
-# Convert every plot to a gtable once. This is the expensive step (it runs
+# Convert every plot (or other object, see `as_layout_gtable()`) to a
+# gtable once. This is the expensive step (it runs
 # the plots' stats); the gtables don't depend on the drawing size, so they
 # are reused on every redraw (window resize, RStudio pane changes).
 #
@@ -60,10 +61,15 @@ measure_leaf <- function(leaf, tag_height = 0, zero_margin = c(FALSE, FALSE)) {
 build_gtables <- function(node, keep_plots = TRUE) {
   map_leaves(node, function(leaf) {
     if (leaf$type == "plot") {
-      if (is.null(leaf$gtable)) leaf$gtable <- ggplot2::ggplotGrob(leaf$plot)
-      leaf$center <- leaf$center %||% leaf$plot$tidylayouts$center
-      leaf$no_tag <- leaf$no_tag %||% leaf$plot$tidylayouts$no_tag
-      if (!keep_plots) leaf$plot <- NULL
+      if (is.null(leaf$gtable)) leaf$gtable <- leaf_gtable(leaf)
+      if (!is.null(leaf$plot)) {
+        leaf$center <- leaf$center %||% leaf$plot$tidylayouts$center
+        leaf$no_tag <- leaf$no_tag %||% leaf$plot$tidylayouts$no_tag
+      }
+      if (!keep_plots) {
+        leaf$plot <- NULL
+        leaf$object <- NULL
+      }
     }
     leaf
   })

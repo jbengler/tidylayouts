@@ -33,3 +33,8 @@ reference:
 - title: Placeholders
 - contents:
   - dummy
+- title: Extending
+  desc: >
+    Place objects from other packages in a layout.
+- contents:
+  - as_layout_gtable

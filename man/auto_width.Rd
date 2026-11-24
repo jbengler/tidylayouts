@@ -51,7 +51,9 @@ its x axis no longer lines up with its neighbours'.
 
 If several plots in a row or column take spare space, they share it
 equally. These functions work for tidyplots and plain ggplots. Layouts are
-modified recursively, i.e. all plots inside them are changed.
+modified recursively, i.e. all plots inside them are changed. Other
+objects in a layout (see \code{\link[=as_layout_gtable]{as_layout_gtable()}}) keep the size they render
+at: \code{auto_margins()} works for them, the others leave them unchanged.
 }
 \examples{
 p1 <- dummy(name = "p1", color = "#0072B2")

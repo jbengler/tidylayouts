@@ -15,6 +15,7 @@ Imports:
     grid,
     utils
 Suggests: 
+    gtable,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),

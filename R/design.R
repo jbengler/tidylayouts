@@ -34,7 +34,8 @@
 #' The result is a normal layout, so it can be extended and adjusted with
 #' [new_row()], [layout_spacing()] etc.
 #'
-#' @param ... ggplots, grobs or layouts, in the order described above. Lists
+#' @param ... ggplots, grobs, layouts or other objects with an
+#'   [as_layout_gtable()] method, in the order described above. Lists
 #'   are spliced.
 #' @param design A string with one line per row of cells.
 #' @param arrange_by How blocks without spanning plots are built: `"row"`

@@ -7,7 +7,8 @@
 tag_group(...)
 }
 \arguments{
-\item{...}{ggplots, grobs, layouts, or lists of them. All of them form
+\item{...}{ggplots, grobs, layouts, other objects with an
+\code{\link[=as_layout_gtable]{as_layout_gtable()}} method, or lists of them. All of them form
 one group.}
 }
 \value{

@@ -16,7 +16,8 @@ layout_tags(layout, tags = "A", fontsize = 10, fontface = "bold")
 layout_title(layout, title, fontsize = 12, fontface = "bold")
 }
 \arguments{
-\item{layout}{A layout, ggplot or grob.}
+\item{layout}{A layout, ggplot, grob or other object with an
+\code{\link[=as_layout_gtable]{as_layout_gtable()}} method.}
 
 \item{width, height}{Figure size in mm. \code{NULL} leaves it unchanged, \code{NA}
 unsets it.}

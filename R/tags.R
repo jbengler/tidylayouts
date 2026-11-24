@@ -9,7 +9,8 @@
 #' `tag_group(new_row(p1, p2))`. Several plots can also be passed directly:
 #' `new_row(tag_group(p1, p2), p3)`.
 #'
-#' @param ... ggplots, grobs, layouts, or lists of them. All of them form
+#' @param ... ggplots, grobs, layouts, other objects with an
+#'   [as_layout_gtable()] method, or lists of them. All of them form
 #'   one group.
 #'
 #' @returns The modified plot or layout if one object was supplied, otherwise
@@ -41,12 +42,12 @@ tag_group <- function(...) {
       x$tidylayouts$no_tag <- mark(TRUE)
       return(x)
     }
-    if (inherits(x, "grob")) x <- as_node(x)
+    if (inherits(x, "grob") || has_layout_gtable(x)) x <- as_node(x)
     if (is_tidylayout(x)) {
       return(map_leaves(x, function(leaf) {
         if (leaf$type == "plot") {
           flag <- mark(TRUE)
-          leaf$plot$tidylayouts$no_tag <- flag
+          if (!is.null(leaf$plot)) leaf$plot$tidylayouts$no_tag <- flag
           leaf$no_tag <- flag
         } else if (leaf$type == "grob") {
           leaf$no_tag <- mark(TRUE)

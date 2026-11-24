@@ -20,7 +20,8 @@
 #'   plots share one tag, use [tag_group()].
 #' * `layout_title()` adds a title above the figure.
 #'
-#' @param layout A layout, ggplot or grob.
+#' @param layout A layout, ggplot, grob or other object with an
+#'   [as_layout_gtable()] method.
 #' @param width,height Figure size in mm. `NULL` leaves it unchanged, `NA`
 #'   unsets it.
 #' @param inner Gap between plots in mm. One value for both directions, or
