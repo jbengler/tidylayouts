@@ -81,7 +81,9 @@ annotate_axis <- function(node, axis, gap = 0) {
 
 # Top-down: assign each node a panel-span start and size along `axis`.
 # Results are written to `acc` (an environment) keyed by leaf id.
-# `band` is the top of the tag band a leaf belongs to (y axis only).
+# `band` is where a leaf's tag goes: on the y axis the top of its row band,
+# on the x axis the left edge of the column it starts (the decoration edge
+# of the outermost track), so stacked plots get their tags on one line.
 # `slot` is the decoration space (lead, trail) of the track a node sits in;
 # centered plots are centered within their slot including it.
 place_axis <- function(node, axis, start, span, band, acc, gap = 0,
@@ -132,7 +134,10 @@ place_axis <- function(node, axis, start, span, band, acc, gap = 0,
         center = (spans[i] - child_span) / 2,
         0
       )
-      place_axis(child, axis, pos + offset, child_span, track_band, acc, gap,
+      # A plot moved within its track (e.g. centered in a column) takes its
+      # tag along horizontally instead of using the shared left edge.
+      child_band <- if (axis == "x" && offset > 1e-9) Inf else track_band
+      place_axis(child, axis, pos + offset, child_span, child_band, acc, gap,
                  c(track$lead, track$trail))
     }
     pos <- pos + spans[i] + track$trail

@@ -88,13 +88,14 @@ render_layout <- function(layout, available) {
       y0 <- p$y$start - leaf$dims$y$meas$lead
       content <- gt
       box <- c(sum(widths), sum(heights))
-      tag_x <- x0
+      # tags of plots stacked at the left edge of a column share one line
+      tag_x <- min(p$x$band, x0)
       # Centered plots: the slot took the spare space; center the plot in it
       # (like auto margins). The tag stays at the slot's edge.
       if (is_centered(leaf, "x")) {
         slot <- slot_extent(p$x)
         x0 <- slot[1] + (slot[2] - slot[1] - box[1]) / 2
-        tag_x <- slot[1]
+        tag_x <- min(p$x$band, slot[1])
       }
       if (is_centered(leaf, "y")) {
         slot <- slot_extent(p$y) + c(leaf$tag_height, 0)
@@ -103,7 +104,7 @@ render_layout <- function(layout, available) {
     } else {
       x0 <- p$x$start
       y0 <- p$y$start
-      tag_x <- x0
+      tag_x <- min(p$x$band, x0)
       content <- leaf$grob
       box <- c(p$x$span, p$y$span)
     }

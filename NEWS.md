@@ -26,7 +26,8 @@
   tidyplots and plain ggplots.
 * New `tag_group()` lets several plots share one panel tag.
 * New `save_layout()` saves a figure at its exact physical size.
-* `layout_tags()` aligns tags at the top of each row; `layout_size()` sets the
+* `layout_tags()` aligns tags at the top of each row and at the left edge of
+  each column; `layout_size()` sets the
   figure size in mm.
 * `spacer()` without a size now absorbs leftover space.
 * Plot backgrounds are drawn before all plots, so axis labels sticking out

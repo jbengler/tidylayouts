@@ -222,3 +222,31 @@ test_that("a centered plot still gets the spare space of its own row", {
   pl <- solve_fake(l)
   expect_equal(pl$leaf4$x$span, 50)
 })
+
+test_that("tags of plots stacked at a column's left edge share one line", {
+  # rows with different left decorations: A narrow (5), C wide (20)
+  l <- new_row(fake(lead_x = 5), fake(lead_x = 5)) |>
+    new_row(fake(lead_x = 20), fake(lead_x = 8))
+  pl <- solve_fake(l)
+  box_left <- function(id, lead) pl[[id]]$x$start - lead
+  # A and C: the same tag line, at the edge of C's wider decoration
+  expect_equal(pl$leaf1$x$band, pl$leaf3$x$band)
+  expect_equal(pl$leaf3$x$band, box_left("leaf3", 20))
+  # B and D: not first in their row, so their own box edge
+  expect_equal(pl$leaf2$x$band, box_left("leaf2", 5))
+  expect_equal(pl$leaf4$x$band, box_left("leaf4", 8))
+})
+
+test_that("grid columns share a tag line", {
+  g <- tl_grid(fake(lead_x = 5), fake(lead_x = 5), fake(lead_x = 5), fake(lead_x = 15), ncol = 2)
+  pl <- solve_fake(g)
+  expect_equal(pl$leaf2$x$band, pl$leaf4$x$band)
+  expect_equal(pl$leaf2$x$band, pl$leaf4$x$start - 15)
+})
+
+test_that("plots moved within a column keep their tag with them", {
+  l <- new_column(fake(w = 60), fake(), horizontal_align = "center")
+  pl <- solve_fake(l)
+  expect_equal(pl$leaf2$x$band, Inf)
+  expect_lt(pl$leaf1$x$band, pl$leaf2$x$start)
+})

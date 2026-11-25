@@ -189,3 +189,22 @@ test_that("split_background leaves gtables without background untouched", {
   expect_null(out$background)
   expect_identical(out$plot, gt)
 })
+
+test_that("stacked plots with different axis labels get aligned tags", {
+  a <- fix(mtcars_plot(), width = 30, height = 30)
+  b <- fix(mtcars_plot("a longer\ny label") +
+    ggplot2::scale_y_continuous(labels = function(x) paste(x, "units")), width = 30, height = 30)
+  l <- new_row(a, a) |> new_row(b, b) |> layout_tags("A")
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  g <- tidylayouts:::layout_grob(l)
+  kids <- tidylayouts:::render_layout(g$layout, c(NA, NA))
+  tags <- Filter(function(k) inherits(k, "text"), kids)
+  x <- vapply(tags, function(t) grid::convertX(t$x, "mm", valueOnly = TRUE), numeric(1))
+  names(x) <- vapply(tags, function(t) t$label, "")
+  expect_equal(x[["A"]], x[["C"]])
+  # A's tag moved left of A's own box, onto the line of C's wider labels
+  plots <- Filter(function(k) inherits(k$children[[1]], "gtable"), kids)
+  box_left_a <- grid::convertX(plots[[1]]$vp$x, "mm", valueOnly = TRUE)
+  expect_lt(x[["A"]], box_left_a)
+})

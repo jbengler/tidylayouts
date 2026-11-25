@@ -58,7 +58,9 @@ ggplot2 normally relies on the plot margin for that space. With small
 gaps, such labels may overlap neighbouring plots, and at the figure's
 edge they can be cut off; use a small \code{outer} margin (1-2 mm) then.
 \item \code{layout_tags()} adds panel tags. Tags are aligned at the top of their
-row, even when plots in that row have different heights. To let several
+row, even when plots in that row have different heights, and plots
+stacked at the left edge of a column share one tag line, even when
+their axis labels differ in width. To let several
 plots share one tag, use \code{\link[=tag_group]{tag_group()}}.
 \item \code{layout_title()} adds a title above the figure.
 }

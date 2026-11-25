@@ -16,7 +16,9 @@
 #'   gaps, such labels may overlap neighbouring plots, and at the figure's
 #'   edge they can be cut off; use a small `outer` margin (1-2 mm) then.
 #' * `layout_tags()` adds panel tags. Tags are aligned at the top of their
-#'   row, even when plots in that row have different heights. To let several
+#'   row, even when plots in that row have different heights, and plots
+#'   stacked at the left edge of a column share one tag line, even when
+#'   their axis labels differ in width. To let several
 #'   plots share one tag, use [tag_group()].
 #' * `layout_title()` adds a title above the figure.
 #'
