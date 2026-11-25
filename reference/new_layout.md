@@ -25,8 +25,9 @@ new_layout(
 
 - ...:
 
-  ggplots, grobs or layouts, in the order described above. Lists are
-  spliced.
+  ggplots, grobs, layouts or other objects with an
+  [`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md)
+  method, in the order described above. Lists are spliced.
 
 - design:
 

@@ -16,7 +16,9 @@ tag_group(...)
 
 - ...:
 
-  ggplots, grobs, layouts, or lists of them. All of them form one group.
+  ggplots, grobs, layouts, other objects with an
+  [`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md)
+  method, or lists of them. All of them form one group.
 
 ## Value
 

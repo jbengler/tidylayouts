@@ -93,7 +93,9 @@ its x axis no longer lines up with its neighbours'.</p></li>
 <code>theme(panel.widths, panel.heights)</code>, always per panel (also for facets).</p></li>
 </ul><p>If several plots in a row or column take spare space, they share it
 equally. These functions work for tidyplots and plain ggplots. Layouts are
-modified recursively, i.e. all plots inside them are changed.</p>
+modified recursively, i.e. all plots inside them are changed. Other
+objects in a layout (see <code><a href="as_layout_gtable.html">as_layout_gtable()</a></code>) keep the size they render
+at: <code>auto_margins()</code> works for them, the others leave them unchanged.</p>
     </div>
 
     <div class="section level2">

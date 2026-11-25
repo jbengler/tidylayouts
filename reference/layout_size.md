@@ -18,7 +18,9 @@ layout_title(layout, title, fontsize = 12, fontface = "bold")
 
 - layout:
 
-  A layout, ggplot or grob.
+  A layout, ggplot, grob or other object with an
+  [`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md)
+  method.
 
 - width, height:
 

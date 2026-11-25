@@ -27,7 +27,10 @@ new_grid(
 - ...:
 
   A layout (optional, first) followed by ggplots (including tidyplots),
-  grobs or layouts. Lists are spliced, so the output of
+  grobs, layouts, or other objects that render themselves to a gtable
+  (see
+  [`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md)),
+  such as tidymontage montages. Lists are spliced, so the output of
   [`auto_height()`](https://jbengler.github.io/tidylayouts/reference/auto_width.md)
   can be passed directly.
 

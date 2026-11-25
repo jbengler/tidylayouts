@@ -44,3 +44,10 @@ Adjust layout properties.
 - [`dummy()`](https://jbengler.github.io/tidylayouts/reference/dummy.md)
   [`spacer()`](https://jbengler.github.io/tidylayouts/reference/dummy.md)
   : Placeholders
+
+## Extending
+
+Place objects from other packages in a layout.
+
+- [`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md)
+  : Render an object to a gtable for a layout

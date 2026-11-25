@@ -57,7 +57,11 @@ splice such lists, so `new_column(auto_height(p1, p2))` works.
 
 If several plots in a row or column take spare space, they share it
 equally. These functions work for tidyplots and plain ggplots. Layouts
-are modified recursively, i.e. all plots inside them are changed.
+are modified recursively, i.e. all plots inside them are changed. Other
+objects in a layout (see
+[`as_layout_gtable()`](https://jbengler.github.io/tidylayouts/reference/as_layout_gtable.md))
+keep the size they render at: `auto_margins()` works for them, the
+others leave them unchanged.
 
 ## Examples
 
