@@ -54,7 +54,8 @@
   [`save_layout()`](https://jbengler.github.io/tidylayouts/reference/save_layout.md)
   saves a figure at its exact physical size.
 - [`layout_tags()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md)
-  aligns tags at the top of each row;
+  aligns tags at the top of each row and at the left edge of each
+  column;
   [`layout_size()`](https://jbengler.github.io/tidylayouts/reference/layout_size.md)
   sets the figure size in mm.
 - [`spacer()`](https://jbengler.github.io/tidylayouts/reference/dummy.md)
