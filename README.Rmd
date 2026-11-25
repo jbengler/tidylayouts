@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 # tidylayouts <a href="https://jbengler.github.io/tidylayouts/"><img src="man/figures/logo.svg" align="right" height="139" alt="tidylayouts website" /></a>
 
 <!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 The goal of `tidylayouts` is to streamline the creation of multi-plot layouts for scientific papers. It allows to gradually expand and adjust layouts using a consistent and intuitive syntax.
